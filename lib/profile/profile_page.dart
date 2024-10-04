@@ -1,0 +1,101 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:reporter/models/user_model.dart';
+import 'package:reporter/services/auth_service.dart';
+import 'package:reporter/services/user_service.dart';
+
+import '../auth/enter/enter_page.dart';
+
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        child: Container(
+          margin: const EdgeInsets.only(left: 30, right: 30, top: 50),
+          child: StreamBuilder<UserModel?>(
+              stream: UserService().getUserData(),
+              builder: (context, snapshot){
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasError) {
+                  return Center(child: Text('Помилка при отриманні даних'));
+                }
+
+                final user = snapshot.data;
+
+                if (user == null) {
+                  return Center(child: Text('Користувача не знайдено'));
+                }
+                return Column(
+                  children: [
+                    const Text(
+                      'Профіль',
+                      style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 30,
+                          color: Colors.black),
+                    ),
+                    SizedBox(height: 20),
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: Colors.grey,
+                          radius: 34,
+                          child: Icon(Icons.person_rounded, size: 34, color: Colors.white,),
+                        ),
+                        SizedBox(width: 20,),
+                        Text(
+                          user.name!,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 26,
+                              color: Colors.black),
+                        ),
+                      ],
+                    ),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 15.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            AuthService.leaveSession();
+                            Get.offAllNamed('/enter');
+
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                          child: Container(
+                            margin:
+                            const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                            child: const Text(
+                              'Вийти',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }
+          )
+        ),
+      ),
+    );
+  }
+}
