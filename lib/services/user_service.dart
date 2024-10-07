@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:reporter/services/auth_service.dart';
 
 import '../models/user_model.dart';
 
@@ -20,6 +21,56 @@ class UserService {
         );
       }
       return null;
+    });
+  }
+
+  static Future<void> checkAndSaveRole() async {
+    User? user = _auth.currentUser;
+
+    if (user != null) {
+      DocumentSnapshot<Map<String, dynamic>> snapshot =
+      await _firestore.collection('users').doc(user.uid).get();
+
+      if (snapshot.exists) {
+        final data = snapshot.data();
+        AuthService.saveRole(data?['role']) ;
+      }
+    }
+
+  }
+
+  static Future<void> updateUserName(String newName) async {
+    User? user = _auth.currentUser;
+
+    if (user != null) {
+      try {
+        await user.updateDisplayName(newName);
+        await user.reload();
+
+        await _firestore.collection('users').doc(user.uid).update({
+          'name': newName,
+        });
+
+      } catch (e) {
+        rethrow;
+      }
+    }
+  }
+
+  Stream<List<UserModel>> getAllUsersStream() {
+    return _firestore.collection('users').snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+        print('------------------------------');
+        print(data);
+        return UserModel(
+          id: doc.id,
+          role: data['role'],
+          name: data['name'],
+          //department: data['department'],
+          email: data['email'],
+        );
+      }).toList();
     });
   }
 

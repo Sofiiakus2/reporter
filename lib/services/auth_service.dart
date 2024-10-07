@@ -13,6 +13,17 @@ class AuthService{
     await prefs.setString('userId', userId);
   }
 
+  static void saveRole(String role) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('role', role);
+  }
+
+  static Future<String?> getRole() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    return preferences.getString('role');
+  }
+
+
   static Future<void> createUser (UserModel user)async{
     try{
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
@@ -24,6 +35,7 @@ class AuthService{
         'id': userCredential.user?.uid,
         'email': user.email,
         'name': user.name,
+        'role': 'user'
       });
     }catch(e){
       rethrow;

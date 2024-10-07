@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:reporter/models/user_model.dart';
 import 'package:reporter/services/auth_service.dart';
+import 'package:reporter/services/user_service.dart';
 
 
 class EnterPage extends StatefulWidget {
@@ -100,6 +101,7 @@ class _EnterPageState extends State<EnterPage> {
                         password: passwordController.text
                     );
                     if(await AuthService.signInWithEmailAndPassword(user)){
+                      UserService.checkAndSaveRole();
                       Navigator.pushNamed(context, "/bottomNavBar");
                     }
                   },

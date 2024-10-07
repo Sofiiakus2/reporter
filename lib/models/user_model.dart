@@ -1,6 +1,7 @@
 import 'package:reporter/models/report_model.dart';
 
 class UserModel{
+  final String? id;
   final String? role;
   final String? name;
   final String? department;
@@ -14,6 +15,7 @@ class UserModel{
   final ReportModel? todayReport;
 
   UserModel({
+    this.id,
     this.role,
    this.name,
     this.department,
