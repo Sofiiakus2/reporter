@@ -24,6 +24,22 @@ class UserService {
     });
   }
 
+  Future<String> getUserDepartment() async {
+    User? user = _auth.currentUser;
+
+    if (user != null) {
+      final snapshot = await _firestore.collection('users').doc(user.uid).get();
+
+      if (snapshot.exists) {
+        final data = snapshot.data();
+        return data?['department'] ?? '';
+      }
+    }
+
+    return '';
+  }
+
+
   static Future<void> checkAndSaveRole() async {
     User? user = _auth.currentUser;
 
@@ -58,21 +74,55 @@ class UserService {
   }
 
   Stream<List<UserModel>> getAllUsersStream() {
+    final User? currentUser = FirebaseAuth.instance.currentUser;
+
     return _firestore.collection('users').snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) {
+      return snapshot.docs
+          .where((doc) => doc.id != currentUser?.uid)
+          .map((doc) {
         final data = doc.data();
-        print('------------------------------');
-        print(data);
         return UserModel(
           id: doc.id,
           role: data['role'],
           name: data['name'],
-          //department: data['department'],
+          department: data['department'] ?? '',
           email: data['email'],
         );
       }).toList();
     });
   }
+
+  Stream<List<UserModel>> getAllWorkersStream(String department) {
+    final User? currentUser = FirebaseAuth.instance.currentUser;
+
+    print('HERE');
+    return _firestore
+        .collection('users')
+        .where('role', isEqualTo: 'user')
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.where((doc) {
+        final userDepartment = doc.data()['department'];
+
+        return doc.id != currentUser?.uid &&
+            (userDepartment == null || userDepartment.isEmpty || userDepartment == department);
+      }).map((doc) {
+        final data = doc.data();
+
+        return UserModel(
+          id: doc.id,
+          role: data['role'],
+          name: data['name'],
+          department: data['department'] ?? '',
+          email: data['email'],
+        );
+      }).toList();
+    });
+  }
+
+
+
+
 
   static Future<Map<String, bool>> getPlanToDo() async {
     User? currentUser = _auth.currentUser;

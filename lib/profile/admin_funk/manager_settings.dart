@@ -15,7 +15,6 @@ class ManagerSettings extends StatefulWidget {
 class _ManagerSettingsState extends State<ManagerSettings> {
   final UserService userService = UserService();
 
-  // Map для збереження стану чекбоксів кожного користувача
   Map<String, bool> checkedUsers = {};
 
   @override
@@ -40,10 +39,14 @@ class _ManagerSettingsState extends State<ManagerSettings> {
 
             final users = snapshot.data ?? [];
 
-            // Переконайтесь, що для кожного користувача створено запис у `checkedUsers`
             for (var user in users) {
               if (!checkedUsers.containsKey(user.email)) {
-                checkedUsers[user.email] = false; // Початкове значення чекбокса
+                if(user.role == 'subadmin'){
+                  checkedUsers[user.email] = true;
+                }else{
+                  checkedUsers[user.email] = false;
+                }
+
               }
             }
 
@@ -67,9 +70,28 @@ class _ManagerSettingsState extends State<ManagerSettings> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              user.name ?? 'No Name',
-                              style: const TextStyle(fontSize: 22),
+                            RichText(
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: user.name ?? 'No Name',
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                     // fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  if(checkedUsers[user.email]==true)
+                                  TextSpan(
+                                    text: ' - ${user.department}',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontStyle: FontStyle.italic,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                             Checkbox(
                               value: checkedUsers[user.email],

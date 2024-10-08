@@ -24,7 +24,6 @@ class AdminService {
     try {
       User? currentUser = _auth.currentUser;
 
-      // Check if the user is logged in
       if (currentUser == null) {
         print("No user is currently signed in.");
         return;
@@ -32,28 +31,23 @@ class AdminService {
 
       DocumentSnapshot userDoc = await _firestore.collection('users').doc(currentUser.uid).get();
 
-      List<String> departments = []; // Initialize the departments list
+      List<String> departments = [];
 
       if (userDoc.exists) {
-        // Cast the data to a Map<String, dynamic> type
         final userData = userDoc.data() as Map<String, dynamic>?;
 
-        // Check if 'departments' field exists and fetch it
         if (userData != null && userData.containsKey('departments')) {
           departments = List<String>.from(userData['departments']);
         }
 
-        // Add new department only if it doesn't already exist
         if (!departments.contains(newDepartment)) {
           departments.add(newDepartment);
 
-          // Update the user document with the new list of departments
           await _firestore.collection('users').doc(currentUser.uid).update({
             'departments': departments,
           });
         }
       } else {
-        // If the document doesn't exist, create it with the new department
         await _firestore.collection('users').doc(currentUser.uid).set({
           'departments': [newDepartment],
         });

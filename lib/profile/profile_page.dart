@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:reporter/models/user_model.dart';
 import 'package:reporter/profile/admin_funk/manager_settings.dart';
+import 'package:reporter/profile/subadmin_funk/worker_settings.dart';
 import 'package:reporter/services/auth_service.dart';
 import 'package:reporter/services/user_service.dart';
 
@@ -117,6 +118,33 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                     ),
+                    if(user.role == 'subadmin')
+                      GestureDetector(
+                        onTap: (){
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => WorkerSettings()),
+                          );
+                        },
+                        child: Container(
+                          width: screenSize.width,
+                          height: 70,
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Colors.grey.withOpacity(0.3)
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Налаштування працівників',style: TextStyle(
+                                  fontSize: 18
+                              ),),
+                              Icon(Icons.navigate_next, size: 26,)
+                            ],
+                          ),
+                        ),
+                      ),
                     SizedBox(height: 25,),
                     Align(
                       alignment: Alignment.bottomCenter,

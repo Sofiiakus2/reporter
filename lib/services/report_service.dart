@@ -73,5 +73,78 @@ class ReportService {
     }
   }
 
+  static Stream<List<ReportModel>> getReportsByDepartmentsStream(String department) async* {
+    User? currentUser = _auth.currentUser;
+
+    if (currentUser != null) {
+      try {
+        // Збираємо звіти для всіх користувачів, які належать до заданого відділу
+        yield* _firestore
+            .collection('users')
+            .where('department', isEqualTo: department) // Фільтруємо по відділу
+            .snapshots()
+            .asyncMap((snapshot) {
+          List<ReportModel> reports = [];
+
+          for (var userDoc in snapshot.docs) {
+            // Перевіряємо, чи це не поточний користувач
+            if (userDoc.id != currentUser.uid) {
+              Map<String, dynamic>? userData = userDoc.data() as Map<String, dynamic>?;
+              List<dynamic>? reportsData = userData?['reports'] as List<dynamic>?;
+
+              if (reportsData != null) {
+                // Додаємо звіти користувача до списку
+                reports.addAll(
+                  reportsData.map((report) => ReportModel.fromJson(report as Map<String, dynamic>)).toList(),
+                );
+              }
+            }
+          }
+
+          return reports;
+        });
+      } catch (e) {
+        print('Error fetching reports: $e');
+        yield [];
+      }
+    } else {
+      yield [];
+    }
+  }
+
+  static Stream<List<ReportModel>> getReportsForAdminStream() async* {
+    User? currentUser = _auth.currentUser;
+
+    if (currentUser != null) {
+      try {
+        yield* _firestore.collection('users').snapshots().asyncMap((snapshot) {
+          List<ReportModel> reports = [];
+
+          for (var userDoc in snapshot.docs) {
+            if (userDoc.id != currentUser.uid) {
+              Map<String, dynamic>? userData = userDoc.data() as Map<String, dynamic>?;
+              List<dynamic>? reportsData = userData?['reports'] as List<dynamic>?;
+
+              if (reportsData != null) {
+                reports.addAll(
+                  reportsData.map((report) => ReportModel.fromJson(report as Map<String, dynamic>)).toList(),
+                );
+              }
+            }
+          }
+
+          return reports;
+        });
+      } catch (e) {
+        print('Error fetching reports: $e');
+        yield [];
+      }
+    } else {
+      yield [];
+    }
+  }
+
+
+
 
 }
