@@ -8,16 +8,19 @@ class ReportService {
 
   static Future<void> saveReport(ReportModel report) async {
     User? currentUser = _auth.currentUser;
-
+    int countOfTasks = 0;
+    int countOfDoneTasks =0;
     if (currentUser != null) {
       try {
         DocumentSnapshot userDoc = await _firestore.collection('users').doc(currentUser.uid).get();
 
         List<dynamic> currentReports = [];
         if (userDoc.exists) {
-          Map<String, dynamic>? userData = userDoc.data() as Map<String, dynamic>?; // Приведення до Map
+          Map<String, dynamic>? userData = userDoc.data() as Map<String, dynamic>?;
           if (userData != null && userData.containsKey('reports')) {
             currentReports = userData['reports'] as List<dynamic>;
+            countOfTasks = userData['countOfTasks'] ?? 0;
+            countOfDoneTasks = userData['countOfDoneTasks'] ?? 0;
           }
         }
 
@@ -35,6 +38,8 @@ class ReportService {
 
         await _firestore.collection('users').doc(currentUser.uid).set({
           'reports': currentReports,
+          'countOfTasks' : countOfTasks + report.countOfTasks,
+          'countOfDoneTasks': countOfDoneTasks + report.doneTasks
         }, SetOptions(merge: true));
 
       } catch (e) {
@@ -78,22 +83,19 @@ class ReportService {
 
     if (currentUser != null) {
       try {
-        // Збираємо звіти для всіх користувачів, які належать до заданого відділу
         yield* _firestore
             .collection('users')
-            .where('department', isEqualTo: department) // Фільтруємо по відділу
+            .where('department', isEqualTo: department)
             .snapshots()
             .asyncMap((snapshot) {
           List<ReportModel> reports = [];
 
           for (var userDoc in snapshot.docs) {
-            // Перевіряємо, чи це не поточний користувач
             if (userDoc.id != currentUser.uid) {
               Map<String, dynamic>? userData = userDoc.data() as Map<String, dynamic>?;
               List<dynamic>? reportsData = userData?['reports'] as List<dynamic>?;
 
               if (reportsData != null) {
-                // Додаємо звіти користувача до списку
                 reports.addAll(
                   reportsData.map((report) => ReportModel.fromJson(report as Map<String, dynamic>)).toList(),
                 );

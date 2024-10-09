@@ -35,6 +35,8 @@ class AuthService{
         'id': userCredential.user?.uid,
         'email': user.email,
         'name': user.name,
+        'countOfTasks': 0,
+        'countOfDoneTasks':0,
         'role': 'user'
       });
     }catch(e){
@@ -62,6 +64,7 @@ class AuthService{
       await _auth.signOut();
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isLoggedIn', false);
+      await prefs.remove('role');
       print('User signed out successfully.');
     } catch (e) {
       print('Error signing out: $e');

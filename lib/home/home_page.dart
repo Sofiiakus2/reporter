@@ -1,7 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:reporter/home/statistic_view_for_admins.dart';
+import 'package:reporter/home/statistic_view_for_user.dart';
 import 'package:reporter/services/statistic_service.dart';
 import 'package:reporter/today_date_widget/today_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,26 +15,58 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  double value1 = 0;
-  double value2 = 1;
+  double myTodayResult = 0;
+  double myMonthResult = 0;
+
+  double staffTodayResult = 0;
+  double staffMonthResult = 0;
   Timer? _timer;
+  late String? role;
+
+  Future<void> _loadData() async{
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    role = preferences.getString('role');
+  }
 
   @override
   void initState() {
+    _loadData();
     super.initState();
     _updateProgress();
     _startTimer();
   }
 
   Future<void> _updateProgress() async {
-    double progress = await StatisticService.countTodayProgress();
+    double progress1 = await StatisticService.countMyTodayProgress();
+    double progress2 = await StatisticService.countMyMonthProgress();
     setState(() {
-      value1 = progress;
+      myTodayResult = progress1;
+      myMonthResult = progress2;
     });
+
+    if(role == 'admin'){
+      double progress3 = await StatisticService.countAllUsersTodayProgressExceptCurrent();
+      double progress4 = await StatisticService.countAllUsersProgressExceptCurrent();
+
+      setState(() {
+        staffTodayResult = progress3;
+        staffMonthResult = progress4;
+      });
+    }
+
+    if(role == 'subadmin'){
+      double progress3 = await StatisticService.countAllUsersTodayProgressByDepartmentExceptCurrent();
+      double progress4 = await StatisticService.countAllUsersProgressByDepartmentExceptCurrent();
+
+      setState(() {
+        staffTodayResult = progress3;
+        staffMonthResult = progress4;
+      });
+    }
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 20), (timer) {
       _updateProgress();
     });
   }
@@ -50,10 +86,9 @@ class _HomePageState extends State<HomePage> {
         child: Container(
           margin: const EdgeInsets.all(30),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center, // Центруємо вміст
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               TodayWidget(),
-
               Container(
                 margin: const EdgeInsets.only(top: 10),
                 alignment: Alignment.centerLeft,
@@ -66,127 +101,31 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
-              Container(
-                margin: const EdgeInsets.only(top: 10),
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Сьогодні',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.black.withOpacity(0.3),
-                  ),
-                ),
-              ),
-              Container(
-                width: screenSize.width / 1.2,
-                height: screenSize.width / 1.5,
-                decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Center(
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const SizedBox(height: 10),
-                          TweenAnimationBuilder(
-                            tween: Tween<double>(begin: 0, end: value1),
-                            duration: const Duration(seconds: 4),
-                            builder: (context, double vale, child) => Padding(
-                              padding: const EdgeInsets.all(15.0),
-                              child: Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  CircularProgressIndicator(
-                                    strokeWidth: 20,
-                                    strokeAlign: 8,
-                                    strokeCap: StrokeCap.round,
-                                    value: vale,
-                                    color: Colors.black,
-                                    backgroundColor: Colors.white,
-                                  ),
-                                  Text(
-                                    '${(vale * 100).toStringAsFixed(0)}%',
-                                    style: TextStyle(
-                                      fontSize: 26,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
 
-              Container(
-                margin: const EdgeInsets.only(top: 10),
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Місяць',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.black.withOpacity(0.3),
-                  ),
-                ),
-              ),
-              Container(
-                width: screenSize.width / 1.2,
-                height: screenSize.width / 1.5,
-                decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Center(
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const SizedBox(height: 10),
-                          TweenAnimationBuilder(
-                            tween: Tween<double>(begin: 0, end: value2),
-                            duration: const Duration(seconds: 4),
-                            builder: (context, double vale, child) => Padding(
-                              padding: const EdgeInsets.all(15.0),
-                              child: Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  CircularProgressIndicator(
-                                    strokeWidth: 20,
-                                    strokeAlign: 8,
-                                    strokeCap: StrokeCap.round,
-                                    value: vale,
-                                    color: Colors.black,
-                                    backgroundColor: Colors.white,
-                                  ),
-                                  Text(
-                                    '${(vale * 100).toStringAsFixed(0)}%',
-                                    style: TextStyle(
-                                      fontSize: 26,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
+              if(role == 'user')
+                StatisticsForUser(value1: myTodayResult, value2: myMonthResult),
+
+              if(role == 'admin' || role == 'subadmin')
+                Column(
+                  children: [
+                    StatisticViewForAdmins(value1: myTodayResult, value2: myMonthResult),
+                    Container(
+                      margin: const EdgeInsets.only(top: 50),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Результати працівників',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.black.withOpacity(0.3),
+                        ),
                       ),
-                    ],
-                  ),
+                    ),
+                    StatisticViewForAdmins(value1: staffTodayResult, value2: staffMonthResult),
+                  ],
                 ),
-              ),
+
+
             ],
           ),
         ),

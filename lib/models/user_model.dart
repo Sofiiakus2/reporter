@@ -8,10 +8,8 @@ class UserModel{
   final String email;
   final String? password;
   final Map<String, bool>? plansToDo;
-  final int? countTaskForToday;
-  final int? countDoneTasksForToday;
-  final int? countMonthTasks;
-  final int? countDoneManthTasks;
+  final int? countOfTasks;
+  final int? countOfDoneTasks;
   final ReportModel? todayReport;
 
   UserModel({
@@ -22,10 +20,8 @@ class UserModel{
    required this.email,
    this.password,
     this.plansToDo,
-    this.countTaskForToday,
-    this.countDoneTasksForToday,
-    this.countMonthTasks,
-    this.countDoneManthTasks,
+    this.countOfTasks,
+    this.countOfDoneTasks,
     this.todayReport
 });
 }

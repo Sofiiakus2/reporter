@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/widgets.dart';
 import 'package:reporter/services/auth_service.dart';
 
 import '../models/user_model.dart';
@@ -18,6 +19,8 @@ class UserService {
           name: data?['name'],
           department: data?['department'],
           email: data?['email'],
+          countOfTasks: data?['countOfTasks'] ?? 0,
+          countOfDoneTasks: data?['countOfDoneTasks'] ?? 0,
         );
       }
       return null;
@@ -73,7 +76,7 @@ class UserService {
     }
   }
 
-  Stream<List<UserModel>> getAllUsersStream() {
+  Stream<List<UserModel>> getAllUsersData() {
     final User? currentUser = FirebaseAuth.instance.currentUser;
 
     return _firestore.collection('users').snapshots().map((snapshot) {
@@ -87,6 +90,8 @@ class UserService {
           name: data['name'],
           department: data['department'] ?? '',
           email: data['email'],
+          countOfTasks: data['countOfTasks'],
+          countOfDoneTasks: data['countOfDoneTasks']
         );
       }).toList();
     });
@@ -124,14 +129,11 @@ class UserService {
 
 
 
-  static Future<Map<String, bool>> getPlanToDo() async {
-    User? currentUser = _auth.currentUser;
-
-    if (currentUser != null) {
-      try {
+  static Future<Map<String, bool>> getPlanToDo(String userId) async {
+    try   {
         DocumentSnapshot userDoc = await _firestore
             .collection('users')
-            .doc(currentUser.uid)
+            .doc(userId)
             .get();
 
         if (userDoc.exists) {
@@ -161,9 +163,7 @@ class UserService {
       } catch (e) {
         rethrow;
       }
-    } else {
-      throw Exception("No user is signed in");
-    }
+
   }
 
   static Future<void> setPlanToDo(List<String> tasks) async {

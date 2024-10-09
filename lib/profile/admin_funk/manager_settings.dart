@@ -28,7 +28,7 @@ class _ManagerSettingsState extends State<ManagerSettings> {
       body: Container(
         margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
         child: StreamBuilder<List<UserModel>>(
-          stream: userService.getAllUsersStream(),
+          stream: userService.getAllUsersData(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());

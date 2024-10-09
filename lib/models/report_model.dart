@@ -3,12 +3,14 @@ class ReportModel{
   final int countOfTasks;
   final int doneTasks;
   final List<String> plansToDo;
+  final String? userName;
 
   ReportModel({
     required this.date,
     required this.countOfTasks,
     required this.doneTasks,
-    required this.plansToDo
+    required this.plansToDo,
+    this.userName,
 });
 
   factory ReportModel.fromJson(Map<String, dynamic> json) {
