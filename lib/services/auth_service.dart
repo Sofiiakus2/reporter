@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reporter/models/user_model.dart';
+import 'package:reporter/services/user_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService{
@@ -52,6 +53,7 @@ class AuthService{
       );
 
       saveLoginState(userCredential.user!.uid);
+      await UserService.checkAndSaveRole();
 
       return userCredential.user != null;
     } catch(e){

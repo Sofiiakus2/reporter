@@ -5,6 +5,7 @@ import 'package:reporter/models/report_model.dart';
 import 'package:reporter/services/report_service.dart';
 import 'package:reporter/services/user_service.dart';
 import 'package:reporter/today_date_widget/today_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TasksPage extends StatefulWidget {
   const TasksPage({super.key});
@@ -19,9 +20,28 @@ class _TasksPageState extends State<TasksPage> {
   List<bool> isCheckedToDo = [];
   bool tasksScheduled = false;
 
+
   @override
   void initState() {
     super.initState();
+    _loadTasksScheduled();
+  }
+
+  Future<void> _loadTasksScheduled() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    DateTime today = DateTime.now();
+    String todayKey = '${today.year}-${today.month}-${today.day}';
+
+    setState(() {
+      tasksScheduled = prefs.getBool(todayKey) ?? false;
+    });
+  }
+
+  Future<void> _setTasksScheduled(bool value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    DateTime today = DateTime.now();
+    String todayKey = '${today.year}-${today.month}-${today.day}';
+    await prefs.setBool(todayKey, value);
   }
 
   @override
@@ -76,14 +96,17 @@ class _TasksPageState extends State<TasksPage> {
       body: Stack(
         children: [
           SingleChildScrollView(
+            physics: BouncingScrollPhysics(),
             child: Container(
               margin: const EdgeInsets.only(left: 30, right: 30, top: 50),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TodayWidget(),
-                  const Text(
-                    'Створіть звіт',
+                  Text(
+                    tasksScheduled
+                      ? 'Звіт за сьогодні сформовано.\n\nЗавтра тут з\'являться нові задачі'
+                      : 'Створіть звіт',
                     style: TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 30,
@@ -140,46 +163,72 @@ class _TasksPageState extends State<TasksPage> {
                           ),
                         ],
                       )
-                          : const Text('Ви не поставили задачі на сьогодні. Заплануйте їх на завтра',
+                          : Text(
+                            tasksScheduled
+                              ? ''
+                              : 'Ви не поставили задачі на сьогодні. Заплануйте їх на завтра',
                           style: TextStyle(fontSize: 20));
                     },
                   ),
                   const SizedBox(height: 30),
-                  Text(
-                    DateTime.now().weekday == DateTime.friday || DateTime.now().weekday == DateTime.saturday
-                        ? 'Плануйте на понеділок'
-                        : 'Заплануйте роботу на завтра',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 22,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  ListView.builder(
-                    padding: const EdgeInsets.only(top: 20.0),
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: taskWidgets.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.withOpacity(0.3),
-                                  borderRadius: BorderRadius.circular(6.0),
-                                ),
-                                child: TextField(
-                                  controller: taskWidgets[index],
-                                  decoration: InputDecoration(
-                                    suffixIcon: index == taskWidgets.length - 1
-                                        ? Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        IconButton(
+                  tasksScheduled
+                  ? SizedBox()
+                  : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        DateTime.now().weekday == DateTime.friday || DateTime.now().weekday == DateTime.saturday
+                            ? 'Плануйте на понеділок'
+                            : 'Заплануйте роботу на завтра',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 22,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      ListView.builder(
+                        padding: const EdgeInsets.only(top: 20.0),
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: taskWidgets.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 20),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.withOpacity(0.3),
+                                      borderRadius: BorderRadius.circular(6.0),
+                                    ),
+                                    child: TextField(
+                                      controller: taskWidgets[index],
+                                      decoration: InputDecoration(
+                                        suffixIcon: index == taskWidgets.length - 1
+                                            ? Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  taskWidgets.removeAt(index);
+                                                });
+                                              },
+                                              icon: const Icon(Icons.remove_circle_outline),
+                                            ),
+                                            IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  taskWidgets.add(TextEditingController());
+                                                });
+                                              },
+                                              icon: const Icon(Icons.add_circle_outline),
+                                            ),
+                                          ],
+                                        )
+                                            : IconButton(
                                           onPressed: () {
                                             setState(() {
                                               taskWidgets.removeAt(index);
@@ -187,40 +236,27 @@ class _TasksPageState extends State<TasksPage> {
                                           },
                                           icon: const Icon(Icons.remove_circle_outline),
                                         ),
-                                        IconButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              taskWidgets.add(TextEditingController());
-                                            });
-                                          },
-                                          icon: const Icon(Icons.add_circle_outline),
+                                        hintText: 'Завдання',
+                                        hintStyle: const TextStyle(
+                                            fontSize: 16, fontWeight: FontWeight.bold),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(6.0),
+                                          borderSide: BorderSide.none,
                                         ),
-                                      ],
-                                    )
-                                        : IconButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          taskWidgets.removeAt(index);
-                                        });
-                                      },
-                                      icon: const Icon(Icons.remove_circle_outline),
-                                    ),
-                                    hintText: 'Завдання',
-                                    hintStyle: const TextStyle(
-                                        fontSize: 16, fontWeight: FontWeight.bold),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(6.0),
-                                      borderSide: BorderSide.none,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
-                          ],
-                        ),
-                      );
-                    },
+                          );
+                        },
+                      ),
+                    ],
                   ),
+              SizedBox(
+                height: WidgetsBinding.instance.window.viewInsets.bottom / WidgetsBinding.instance.window.devicePixelRatio,
+              )
                 ],
               ),
             ),
@@ -250,6 +286,7 @@ class _TasksPageState extends State<TasksPage> {
                     taskWidgets.add(TextEditingController());
                     tasksScheduled = true;
                   });
+                  _setTasksScheduled(true);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
@@ -274,4 +311,5 @@ class _TasksPageState extends State<TasksPage> {
       ),
     );
   }
+
 }

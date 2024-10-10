@@ -13,6 +13,22 @@ class ReportModel{
     this.userName,
 });
 
+  ReportModel copyWith({
+    String? userName,
+    DateTime? date,
+    int? countOfTasks,
+    int? doneTasks,
+    List<String>? plansToDo,
+  }) {
+    return ReportModel(
+      userName: userName ?? this.userName,
+      date: date ?? this.date,
+      countOfTasks: countOfTasks ?? this.countOfTasks,
+      doneTasks: doneTasks ?? this.doneTasks,
+      plansToDo: plansToDo ?? this.plansToDo,
+    );
+  }
+
   factory ReportModel.fromJson(Map<String, dynamic> json) {
     return ReportModel(
       date: DateTime.parse(json['date']),

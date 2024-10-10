@@ -35,7 +35,7 @@ class _ReportsViewState extends State<ReportsView> {
           return Center(child: Text('Error: ${snapshot.error}'));
         }
 
-        final reports = snapshot.data ?? [];
+        final reports = (snapshot.data ?? []).reversed.toList();
 
         if (reports.isEmpty) {
           return Text('Ще немає звітів про роботу') ;
@@ -73,7 +73,7 @@ class _ReportsViewState extends State<ReportsView> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         if(!widget.isMine)
-                          Text('Name'),
+                          Text(report.userName ?? 'l'),
                         Text(formattedDate,
                           style: TextStyle(fontSize: 18),),
                         SizedBox(height: 10,),

@@ -78,6 +78,41 @@ class ReportService {
     }
   }
 
+  // static Stream<List<ReportModel>> getReportsByDepartmentsStream(String department) async* {
+  //   User? currentUser = _auth.currentUser;
+  //
+  //   if (currentUser != null) {
+  //     try {
+  //       yield* _firestore
+  //           .collection('users')
+  //           .where('department', isEqualTo: department)
+  //           .snapshots()
+  //           .asyncMap((snapshot) {
+  //         List<ReportModel> reports = [];
+  //
+  //         for (var userDoc in snapshot.docs) {
+  //           if (userDoc.id != currentUser.uid) {
+  //             Map<String, dynamic>? userData = userDoc.data() as Map<String, dynamic>?;
+  //             List<dynamic>? reportsData = userData?['reports'] as List<dynamic>?;
+  //
+  //             if (reportsData != null) {
+  //               reports.addAll(
+  //                 reportsData.map((report) => ReportModel.fromJson(report as Map<String, dynamic>)).toList(),
+  //               );
+  //             }
+  //           }
+  //         }
+  //
+  //         return reports;
+  //       });
+  //     } catch (e) {
+  //       print('Error fetching reports: $e');
+  //       yield [];
+  //     }
+  //   } else {
+  //     yield [];
+  //   }
+  // }
   static Stream<List<ReportModel>> getReportsByDepartmentsStream(String department) async* {
     User? currentUser = _auth.currentUser;
 
@@ -94,10 +129,17 @@ class ReportService {
             if (userDoc.id != currentUser.uid) {
               Map<String, dynamic>? userData = userDoc.data() as Map<String, dynamic>?;
               List<dynamic>? reportsData = userData?['reports'] as List<dynamic>?;
+              String? userName = userData?['name'];
 
               if (reportsData != null) {
                 reports.addAll(
-                  reportsData.map((report) => ReportModel.fromJson(report as Map<String, dynamic>)).toList(),
+                  reportsData.map((report) {
+                    var reportModel = ReportModel.fromJson(report as Map<String, dynamic>);
+
+                    reportModel = reportModel.copyWith(userName: userName);
+
+                    return reportModel;
+                  }).toList(),
                 );
               }
             }
@@ -113,6 +155,7 @@ class ReportService {
       yield [];
     }
   }
+
 
   static Stream<List<ReportModel>> getReportsForAdminStream() async* {
     User? currentUser = _auth.currentUser;

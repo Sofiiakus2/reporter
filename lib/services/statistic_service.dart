@@ -97,6 +97,7 @@ class StatisticService{
       totalProgress = (totalCountOfDoneTasks / totalCountOfTasks) ;
     }
 
+    print(totalProgress);
     return totalProgress;
   }
 

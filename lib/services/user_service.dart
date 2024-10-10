@@ -45,11 +45,9 @@ class UserService {
 
   static Future<void> checkAndSaveRole() async {
     User? user = _auth.currentUser;
-
     if (user != null) {
       DocumentSnapshot<Map<String, dynamic>> snapshot =
       await _firestore.collection('users').doc(user.uid).get();
-
       if (snapshot.exists) {
         final data = snapshot.data();
         AuthService.saveRole(data?['role']) ;

@@ -101,7 +101,6 @@ class _EnterPageState extends State<EnterPage> {
                         password: passwordController.text
                     );
                     if(await AuthService.signInWithEmailAndPassword(user)){
-                      UserService.checkAndSaveRole();
                       Navigator.pushNamed(context, "/bottomNavBar");
                     }
                   },

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:reporter/home/statistic_view_for_admins.dart';
 import 'package:reporter/home/statistic_view_for_user.dart';
+import 'package:reporter/services/auth_service.dart';
 import 'package:reporter/services/statistic_service.dart';
 import 'package:reporter/today_date_widget/today_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,11 +22,10 @@ class _HomePageState extends State<HomePage> {
   double staffTodayResult = 0;
   double staffMonthResult = 0;
   Timer? _timer;
-  late String? role;
+  String? role;
 
   Future<void> _loadData() async{
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    role = preferences.getString('role');
+    role = await AuthService.getRole();
   }
 
   @override
