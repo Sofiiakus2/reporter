@@ -15,7 +15,7 @@ class AdminService {
       }
       return [];
     } catch (e) {
-      print("Error fetching departments: $e");
+      Exception("Error fetching departments: $e");
       return [];
     }
   }
@@ -25,7 +25,6 @@ class AdminService {
       User? currentUser = _auth.currentUser;
 
       if (currentUser == null) {
-        print("No user is currently signed in.");
         return;
       }
 
@@ -53,7 +52,7 @@ class AdminService {
         });
       }
     } catch (e) {
-      print("Error adding department: $e");
+      Exception("Error adding department: $e");
     }
   }
 
@@ -66,7 +65,7 @@ class AdminService {
         'role':'subadmin'
       });
     } catch (e) {
-      print('Error making user manager: $e');
+      Exception('Error making user manager: $e');
     }
   }
 
@@ -79,7 +78,7 @@ class AdminService {
         'role':'user'
       });
     } catch (e) {
-      print('Error making user manager: $e');
+      Exception('Error making user manager: $e');
     }
   }
 }

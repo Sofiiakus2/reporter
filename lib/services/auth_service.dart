@@ -67,9 +67,8 @@ class AuthService{
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isLoggedIn', false);
       await prefs.remove('role');
-      print('User signed out successfully.');
     } catch (e) {
-      print('Error signing out: $e');
+      rethrow;
     }
   }
 

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:reporter/analitik/reports_view.dart';
@@ -18,11 +19,14 @@ class AnalitikPage extends StatefulWidget {
 class _AnalitikPageState extends State<AnalitikPage> with SingleTickerProviderStateMixin{
 
   late String? role;
+  late String? userId;
 
   Future<void> _loadData() async{
     SharedPreferences preferences = await SharedPreferences.getInstance();
     role = preferences.getString('role');
 
+    FirebaseAuth _auth = FirebaseAuth.instance;
+    userId = _auth.currentUser!.uid;
   }
 
   @override
@@ -34,6 +38,7 @@ class _AnalitikPageState extends State<AnalitikPage> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -55,7 +60,7 @@ class _AnalitikPageState extends State<AnalitikPage> with SingleTickerProviderSt
                   children: [
                     TodayWidget(),
                     Text('Ваші результати:', style: TextStyle(fontSize: 18),),
-                    ReportsView(funk: ReportService.getReportsStream(), isMine: true,),
+                    ReportsView(funk: ReportService.getReportsStream(userId!), isMine: true,),
                     SizedBox(height: 30,),
                     if(role == 'subadmin' )
                       Column(

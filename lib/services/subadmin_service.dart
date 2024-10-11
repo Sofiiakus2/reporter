@@ -13,7 +13,7 @@ class SubadminService{
         'department': department,
       });
     } catch (e) {
-      print('Error making user manager: $e');
+      Exception('Error making user manager: $e');
     }
   }
 
@@ -25,7 +25,7 @@ class SubadminService{
         'department': '',
       });
     } catch (e) {
-      print('Error making user manager: $e');
+      Exception('Error making user manager: $e');
     }
   }
 

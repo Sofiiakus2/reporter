@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/widgets.dart';
 import 'package:reporter/services/auth_service.dart';
 
 import '../models/user_model.dart';
@@ -26,6 +25,7 @@ class UserService {
       return null;
     });
   }
+
 
   Future<String> getUserDepartment() async {
     User? user = _auth.currentUser;
@@ -98,7 +98,6 @@ class UserService {
   Stream<List<UserModel>> getAllWorkersStream(String department) {
     final User? currentUser = FirebaseAuth.instance.currentUser;
 
-    print('HERE');
     return _firestore
         .collection('users')
         .where('role', isEqualTo: 'user')
@@ -191,7 +190,7 @@ class UserService {
           'planToDo': planToDoData,
         });
       } catch (e) {
-        print('Error updating tasks: $e');
+        rethrow;
       }
     }
   }
@@ -258,10 +257,8 @@ class UserService {
           }
         });
       } catch (e) {
-        print("Error updating task status: $e");
+        rethrow;
       }
-    } else {
-      print("No user is currently signed in.");
     }
   }
 
@@ -291,10 +288,8 @@ class UserService {
           }
         });
       } catch (e) {
-        print("Error updating task counts: $e");
+        rethrow;
       }
-    } else {
-      print("No user is currently signed in.");
     }
   }
 }

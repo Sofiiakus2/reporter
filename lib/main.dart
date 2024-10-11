@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
@@ -6,6 +7,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:reporter/auth/enter/enter_page.dart';
 import 'package:reporter/auth/registration/registration_page.dart';
 import 'package:reporter/bottomNatigationBar/bottom_nav_bar.dart';
+import 'package:reporter/firebase_api/firebase_api.dart';
+import 'package:reporter/services/notification_service.dart';
 import 'package:reporter/splash_screen/splash_screen.dart';
 
 
@@ -19,6 +22,8 @@ void main() async{
         projectId: 'reporter-app-f0ec6'
     )
   );
+  await FirebaseApi().initNotifications();
+
   runApp(const MyApp());
 }
 

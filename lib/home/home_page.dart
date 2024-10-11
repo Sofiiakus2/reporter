@@ -26,6 +26,8 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadData() async{
     role = await AuthService.getRole();
+    print('------------------------------');
+    print(role);
   }
 
   @override

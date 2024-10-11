@@ -9,7 +9,8 @@ class ReportService {
   static Future<void> saveReport(ReportModel report) async {
     User? currentUser = _auth.currentUser;
     int countOfTasks = 0;
-    int countOfDoneTasks =0;
+    int countOfDoneTasks = 0;
+
     if (currentUser != null) {
       try {
         DocumentSnapshot userDoc = await _firestore.collection('users').doc(currentUser.uid).get();
@@ -19,8 +20,14 @@ class ReportService {
           Map<String, dynamic>? userData = userDoc.data() as Map<String, dynamic>?;
           if (userData != null && userData.containsKey('reports')) {
             currentReports = userData['reports'] as List<dynamic>;
-            countOfTasks = userData['countOfTasks'] ?? 0;
-            countOfDoneTasks = userData['countOfDoneTasks'] ?? 0;
+
+            if (_isFirstWeekdayOfMonth()) {
+              countOfTasks = 0;
+              countOfDoneTasks = 0;
+            } else {
+              countOfTasks = userData['countOfTasks'] ?? 0;
+              countOfDoneTasks = userData['countOfDoneTasks'] ?? 0;
+            }
           }
         }
 
@@ -38,24 +45,35 @@ class ReportService {
 
         await _firestore.collection('users').doc(currentUser.uid).set({
           'reports': currentReports,
-          'countOfTasks' : countOfTasks + report.countOfTasks,
-          'countOfDoneTasks': countOfDoneTasks + report.doneTasks
+          'countOfTasks': countOfTasks + report.countOfTasks,
+          'countOfDoneTasks': countOfDoneTasks + report.doneTasks,
         }, SetOptions(merge: true));
 
       } catch (e) {
-        print('Error saving report: $e');
+        Exception('Error saving report: $e');
       }
     }
   }
 
+  static bool _isFirstWeekdayOfMonth() {
+    DateTime today = DateTime.now();
+    DateTime firstDayOfMonth = DateTime(today.year, today.month, 1);
+
+    while (firstDayOfMonth.weekday == DateTime.saturday || firstDayOfMonth.weekday == DateTime.sunday) {
+      firstDayOfMonth = firstDayOfMonth.add(Duration(days: 1));
+    }
+
+    return today.year == firstDayOfMonth.year &&
+        today.month == firstDayOfMonth.month &&
+        today.day == firstDayOfMonth.day;
+  }
 
 
-  static Stream<List<ReportModel>> getReportsStream() async* {
-    User? currentUser = _auth.currentUser;
 
-    if (currentUser != null) {
-      try {
-        DocumentReference userDocRef = _firestore.collection('users').doc(currentUser.uid);
+  static Stream<List<ReportModel>> getReportsStream(String currentUserId) async* {
+
+    try {
+        DocumentReference userDocRef = _firestore.collection('users').doc(currentUserId);
 
         yield* userDocRef.snapshots().asyncMap((userDoc) {
           Map<String, dynamic>? userData = userDoc.data() as Map<String, dynamic>?;
@@ -70,49 +88,13 @@ class ReportService {
           }
         });
       } catch (e) {
-        print('Error fetching reports: $e');
+        Exception('Error fetching reports: $e');
         yield [];
       }
-    } else {
-      yield [];
-    }
+
   }
 
-  // static Stream<List<ReportModel>> getReportsByDepartmentsStream(String department) async* {
-  //   User? currentUser = _auth.currentUser;
-  //
-  //   if (currentUser != null) {
-  //     try {
-  //       yield* _firestore
-  //           .collection('users')
-  //           .where('department', isEqualTo: department)
-  //           .snapshots()
-  //           .asyncMap((snapshot) {
-  //         List<ReportModel> reports = [];
-  //
-  //         for (var userDoc in snapshot.docs) {
-  //           if (userDoc.id != currentUser.uid) {
-  //             Map<String, dynamic>? userData = userDoc.data() as Map<String, dynamic>?;
-  //             List<dynamic>? reportsData = userData?['reports'] as List<dynamic>?;
-  //
-  //             if (reportsData != null) {
-  //               reports.addAll(
-  //                 reportsData.map((report) => ReportModel.fromJson(report as Map<String, dynamic>)).toList(),
-  //               );
-  //             }
-  //           }
-  //         }
-  //
-  //         return reports;
-  //       });
-  //     } catch (e) {
-  //       print('Error fetching reports: $e');
-  //       yield [];
-  //     }
-  //   } else {
-  //     yield [];
-  //   }
-  // }
+
   static Stream<List<ReportModel>> getReportsByDepartmentsStream(String department) async* {
     User? currentUser = _auth.currentUser;
 
@@ -148,7 +130,7 @@ class ReportService {
           return reports;
         });
       } catch (e) {
-        print('Error fetching reports: $e');
+        Exception('Error fetching reports: $e');
         yield [];
       }
     } else {
@@ -181,7 +163,7 @@ class ReportService {
           return reports;
         });
       } catch (e) {
-        print('Error fetching reports: $e');
+        Exception('Error fetching reports: $e');
         yield [];
       }
     } else {

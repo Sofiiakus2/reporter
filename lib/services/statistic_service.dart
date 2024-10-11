@@ -1,27 +1,61 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reporter/models/user_model.dart';
+import 'package:reporter/services/report_service.dart';
 import 'package:reporter/services/user_service.dart';
+
+import '../models/report_model.dart';
 
 class StatisticService{
 
   static final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  static Future<double> countMyTodayProgress () async{
+  static Future<double> countMyTodayProgress() async {
     User? currentUser = _auth.currentUser;
-    Map<String, bool> planForToday = await UserService.getPlanToDo(currentUser!.uid);
-    int counter = 0;
 
-    planForToday.forEach((key, value){
-      if(value==true) counter++;
+    if (currentUser != null) {
+      Map<String, bool> planForToday = await UserService.getPlanToDo(currentUser.uid);
 
-    });
-    if(counter == 0){
-      return 0;
-    }else{
-      return (counter/planForToday.length);
+      if (planForToday.isEmpty) {
+        Stream<List<ReportModel>> reportsStream = ReportService.getReportsStream(currentUser.uid);
+        List<ReportModel> reports = await reportsStream.first;
+
+        DateTime today = DateTime.now();
+
+        ReportModel todayReport = reports.firstWhere(
+              (report) => report.date.year == today.year &&
+              report.date.month == today.month &&
+              report.date.day == today.day,
+          orElse: () => ReportModel(
+              date: today,
+              countOfTasks: 0,
+              doneTasks: 0,
+              plansToDo: []
+          ),
+
+        );
+
+        if (todayReport != null && todayReport.countOfTasks > 0) {
+          return todayReport.doneTasks / todayReport.countOfTasks;
+        } else {
+          return 0.0;
+        }
+      }
+
+      int completedTasks = 0;
+      planForToday.forEach((key, value) {
+        if (value == true) completedTasks++;
+      });
+
+      if (completedTasks == 0) {
+        return 0.0;
+      } else {
+        return completedTasks / planForToday.length;
+      }
     }
 
+    return 0.0;
   }
+
 
   static Future<double> countMyMonthProgress() async {
     double progress = 0.0;
@@ -55,8 +89,33 @@ class StatisticService{
 
     await for (List<UserModel?> userList in allUsersStream) {
       for (UserModel? userModel in userList) {
+
         if (userModel != null && userModel.id != currentUser?.uid) {
           Map<String, bool> planForToday = await UserService.getPlanToDo(userModel.id!);
+          if (planForToday.isEmpty) {
+            Stream<List<ReportModel>> reportsStream = ReportService.getReportsStream(userModel.id!);
+            List<ReportModel> reports = await reportsStream.first;
+
+            DateTime today = DateTime.now();
+
+            ReportModel todayReport = reports.firstWhere(
+                  (report) => report.date.year == today.year &&
+                  report.date.month == today.month &&
+                  report.date.day == today.day,
+              orElse: () => ReportModel(
+                  date: today,
+                  countOfTasks: 0,
+                  doneTasks: 0,
+                  plansToDo: []
+              ),
+
+            );
+
+            if (todayReport != null && todayReport.countOfTasks > 0) {
+              globalCountOfTasks += todayReport.countOfTasks;
+              globalCountOfDoneTasks += todayReport.doneTasks;
+            }
+          }
           globalCountOfTasks += planForToday.length;
           planForToday.forEach((key, value){
             if(value==true) globalCountOfDoneTasks++;
@@ -97,7 +156,6 @@ class StatisticService{
       totalProgress = (totalCountOfDoneTasks / totalCountOfTasks) ;
     }
 
-    print(totalProgress);
     return totalProgress;
   }
 
@@ -107,14 +165,38 @@ class StatisticService{
     int globalCountOfDoneTasks = 0;
     User? currentUser = _auth.currentUser;
     String department = await UserService().getUserDepartment();
-
     Stream<List<UserModel?>> allUsersStream = UserService().getAllUsersData();
 
     await for (List<UserModel?> userList in allUsersStream) {
+
       for (UserModel? userModel in userList) {
+
         if (userModel != null && userModel.id != currentUser?.uid && userModel.department == department) {
-          print(userModel.name);
           Map<String, bool> planForToday = await UserService.getPlanToDo(userModel.id!);
+          if (planForToday.isEmpty) {
+            Stream<List<ReportModel>> reportsStream = ReportService.getReportsStream(userModel.id!);
+            List<ReportModel> reports = await reportsStream.first;
+
+            DateTime today = DateTime.now();
+
+            ReportModel todayReport = reports.firstWhere(
+                  (report) => report.date.year == today.year &&
+                  report.date.month == today.month &&
+                  report.date.day == today.day,
+              orElse: () => ReportModel(
+                  date: today,
+                  countOfTasks: 0,
+                  doneTasks: 0,
+                  plansToDo: []
+              ),
+
+            );
+
+            if (todayReport != null && todayReport.countOfTasks > 0) {
+              globalCountOfTasks += todayReport.countOfTasks;
+              globalCountOfDoneTasks += todayReport.doneTasks;
+            }
+          }
           globalCountOfTasks += planForToday.length;
           planForToday.forEach((key, value){
             if(value==true) globalCountOfDoneTasks++;
