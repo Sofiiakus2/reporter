@@ -7,7 +7,6 @@ import 'package:reporter/profile/subadmin_funk/worker_settings.dart';
 import 'package:reporter/services/auth_service.dart';
 import 'package:reporter/services/user_service.dart';
 
-import '../auth/enter/enter_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});

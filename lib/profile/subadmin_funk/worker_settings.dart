@@ -3,7 +3,6 @@ import 'package:reporter/services/subadmin_service.dart';
 
 import '../../models/user_model.dart';
 import '../../services/user_service.dart';
-import '../admin_funk/departments_dialog.dart';
 
 class WorkerSettings extends StatefulWidget {
   const WorkerSettings({super.key});

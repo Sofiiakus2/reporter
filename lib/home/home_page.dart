@@ -5,7 +5,6 @@ import 'package:reporter/home/statistic_view_for_user.dart';
 import 'package:reporter/services/auth_service.dart';
 import 'package:reporter/services/statistic_service.dart';
 import 'package:reporter/today_date_widget/today_widget.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -26,8 +25,6 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadData() async{
     role = await AuthService.getRole();
-    print('------------------------------');
-    print(role);
   }
 
   @override
@@ -81,7 +78,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    Size screenSize = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(

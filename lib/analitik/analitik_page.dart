@@ -1,11 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:reporter/analitik/reports_view.dart';
 import 'package:reporter/services/user_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../models/dates.dart';
-import '../models/report_model.dart';
 import '../services/report_service.dart';
 import '../today_date_widget/today_widget.dart';
 
@@ -25,8 +22,8 @@ class _AnalitikPageState extends State<AnalitikPage> with SingleTickerProviderSt
     SharedPreferences preferences = await SharedPreferences.getInstance();
     role = preferences.getString('role');
 
-    FirebaseAuth _auth = FirebaseAuth.instance;
-    userId = _auth.currentUser!.uid;
+    FirebaseAuth auth = FirebaseAuth.instance;
+    userId = auth.currentUser!.uid;
   }
 
   @override
@@ -37,8 +34,6 @@ class _AnalitikPageState extends State<AnalitikPage> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
