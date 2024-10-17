@@ -38,7 +38,7 @@ class AuthService{
         'name': user.name,
         'countOfTasks': 0,
         'countOfDoneTasks':0,
-        'role': 'user'
+        'role': user.role
       });
     }catch(e){
       rethrow;

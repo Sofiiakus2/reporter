@@ -3,14 +3,22 @@ import 'package:reporter/models/user_model.dart';
 import 'package:reporter/services/auth_service.dart';
 
 
-class RegistrationPage extends StatelessWidget {
+class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key});
 
   @override
+  State<RegistrationPage> createState() => _RegistrationPageState();
+}
+
+class _RegistrationPageState extends State<RegistrationPage> {
+  bool isChecked = false;
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
+  @override
   Widget build(BuildContext context) {
-    TextEditingController usernameController = TextEditingController();
-    TextEditingController emailController = TextEditingController();
-    TextEditingController passwordController = TextEditingController();
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -102,6 +110,26 @@ class RegistrationPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Checkbox(
+                        activeColor: Colors.black,
+                        value: isChecked,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            isChecked = value!;
+                          });
+                        },
+                      ),
+                      Text('я директор',
+                      style: TextStyle(fontSize: 16),)
+                    ],
+                  ),
+                  const SizedBox(
                     height: 60,
                   ),
                   ElevatedButton(
@@ -109,7 +137,8 @@ class RegistrationPage extends StatelessWidget {
                       UserModel newUser = UserModel(
                           name: usernameController.text,
                           email: emailController.text,
-                          password: passwordController.text
+                          password: passwordController.text,
+                          role: isChecked ? 'admin' : 'user'
                       );
                       AuthService.createUser(newUser);
                       Navigator.pushReplacementNamed(context, '/enter');

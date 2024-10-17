@@ -56,7 +56,7 @@ class _TasksPageState extends State<TasksPage> {
     return isCheckedToDo.where((isChecked) => isChecked).length;
   }
 
-  Stream<Map<String, bool>> _getPlanToDoStream() async* {
+  Stream<Map<String, bool>> getPlanToDoStream() async* {
     User? currentUser = FirebaseAuth.instance.currentUser;
 
     if (currentUser != null) {
@@ -113,7 +113,7 @@ class _TasksPageState extends State<TasksPage> {
                         color: Colors.black),
                   ),
                   StreamBuilder<Map<String, bool>>(
-                    stream: _getPlanToDoStream(),
+                    stream: getPlanToDoStream(),
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
                         return Text('Error: ${snapshot.error}');
@@ -266,9 +266,7 @@ class _TasksPageState extends State<TasksPage> {
             child: Padding(
               padding: const EdgeInsets.only(bottom: 15.0),
               child: ElevatedButton(
-                onPressed: tasksScheduled
-                    ? null
-                    : () {
+                onPressed :() {
                   List<String> tasks = taskWidgets.map((controller) => controller.text).toList();
                   ReportModel newReport = ReportModel(
                     date: DateTime.now(),

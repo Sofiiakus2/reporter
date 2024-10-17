@@ -122,7 +122,38 @@ class UserService {
     });
   }
 
+  Stream<Map<String, bool>> getPlanToDoStream() async* {
+    User? currentUser = FirebaseAuth.instance.currentUser;
 
+    if (currentUser != null) {
+      yield* FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser.uid)
+          .snapshots()
+          .map((snapshot) {
+        if (snapshot.exists) {
+          Map<String, dynamic>? data = snapshot.data() as Map<String, dynamic>?;
+
+          if (data != null && data.containsKey('planToDo')) {
+            Map<String, dynamic> planToDoData = data['planToDo'];
+            if (planToDoData.containsKey('date')) {
+              DateTime storedDate = DateTime.parse(planToDoData['date']);
+              DateTime today = DateTime.now();
+              if (storedDate.year == today.year &&
+                  storedDate.month == today.month &&
+                  storedDate.day == today.day &&
+                  planToDoData.containsKey('tasks')) {
+                return Map<String, bool>.from(planToDoData['tasks']);
+              }
+            }
+          }
+        }
+        return {};
+      });
+    } else {
+      yield {};
+    }
+  }
 
 
 

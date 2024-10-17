@@ -1,5 +1,4 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
@@ -8,8 +7,8 @@ import 'package:reporter/auth/enter/enter_page.dart';
 import 'package:reporter/auth/registration/registration_page.dart';
 import 'package:reporter/bottomNatigationBar/bottom_nav_bar.dart';
 import 'package:reporter/firebase_api/firebase_api.dart';
-import 'package:reporter/services/notification_service.dart';
 import 'package:reporter/splash_screen/splash_screen.dart';
+import 'package:reporter/theme.dart';
 
 
 void main() async{
@@ -35,18 +34,14 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
-        useMaterial3: true,
-        textTheme: GoogleFonts.montserratTextTheme(),
-      ),
+      theme: lightTheme,
      initialRoute: '/',
      // home: const BottomNavBar(),
       getPages: [
         GetPage(name: '/', page: () => const SplashScreen()),
         GetPage(name: '/enter', page: () => const EnterPage()),
         GetPage(name: '/registration', page: () => const RegistrationPage()),
-        GetPage(name: '/bottomNavBar', page: () => const BottomNavBar()),
+        GetPage(name: '/bottomNavBar', page: () => BottomNavBar()),
       ],
 
     );
