@@ -70,10 +70,11 @@ class ReportService {
 
 
 
-  static Stream<List<ReportModel>> getReportsStream(String currentUserId) async* {
+  static Stream<List<ReportModel>> getReportsStream() async* {
 
     try {
-        DocumentReference userDocRef = _firestore.collection('users').doc(currentUserId);
+      User? currentUser = _auth.currentUser;
+        DocumentReference userDocRef = _firestore.collection('users').doc(currentUser!.uid);
 
         yield* userDocRef.snapshots().asyncMap((userDoc) {
           Map<String, dynamic>? userData = userDoc.data() as Map<String, dynamic>?;

@@ -16,14 +16,11 @@ class AnalitikPage extends StatefulWidget {
 class _AnalitikPageState extends State<AnalitikPage> with SingleTickerProviderStateMixin{
 
   late String? role;
-  late String? userId;
 
   Future<void> _loadData() async{
     SharedPreferences preferences = await SharedPreferences.getInstance();
     role = preferences.getString('role');
 
-    FirebaseAuth auth = FirebaseAuth.instance;
-    userId = auth.currentUser!.uid;
   }
 
   @override
@@ -55,7 +52,7 @@ class _AnalitikPageState extends State<AnalitikPage> with SingleTickerProviderSt
                   children: [
                     TodayWidget(),
                     Text('Ваші результати:', style: TextStyle(fontSize: 18),),
-                    ReportsView(funk: ReportService.getReportsStream(userId!), isMine: true,),
+                    ReportsView(funk: ReportService.getReportsStream(), isMine: true,),
                     SizedBox(height: 30,),
                     if(role == 'subadmin' )
                       Column(

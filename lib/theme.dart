@@ -41,6 +41,11 @@ final textTheme = TextTheme(
       color: Colors.black
   ),
 
+  labelSmall: GoogleFonts.montserrat(
+      fontSize: 16,
+      fontWeight: FontWeight.w500,
+      color: Colors.black
+  ),
   labelMedium: GoogleFonts.montserrat(
       fontSize: 18,
       fontWeight: FontWeight.w600,

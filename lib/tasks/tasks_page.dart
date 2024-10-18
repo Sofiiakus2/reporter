@@ -1,11 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:reporter/models/report_model.dart';
-import 'package:reporter/services/report_service.dart';
-import 'package:reporter/services/user_service.dart';
-import 'package:reporter/today_date_widget/today_widget.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:reporter/home/tasks_list_view.dart';
+import 'package:reporter/tasks/day_in_calendar.dart';
+import 'package:reporter/theme.dart';
+
+import '../services/statistic_service.dart';
+import 'adding_new_tasks/add_new_task_dialog.dart';
+import 'daily_linear_progress.dart';
 
 class TasksPage extends StatefulWidget {
   const TasksPage({super.key});
@@ -14,298 +16,145 @@ class TasksPage extends StatefulWidget {
   State<TasksPage> createState() => _TasksPageState();
 }
 
-class _TasksPageState extends State<TasksPage> {
-  List<TextEditingController> taskWidgets = [TextEditingController()];
-  Map<String, bool> planToDo = {};
-  List<bool> isCheckedToDo = [];
-  bool tasksScheduled = false;
+class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMixin {
+  DateTime now = DateTime.now();
+  int selectedIndex = 5;
+  late ScrollController _scrollController;
+  double progress = 0.0;
+
+  Future<void> updateProgress() async {
+    DateTime selectedDate = _getSelectedDate(selectedIndex);
+    double progress1 = await StatisticService.countMyProgressForDay(selectedDate);
+    setState(() {
+      progress = progress1;
+    });
+  }
+
+  DateTime _getSelectedDate(int index) {
+    List<DateTime> workDays = DayInCalendar.getWorkDays(now);
+
+    return workDays[index];
+  }
 
 
   @override
   void initState() {
     super.initState();
-    _loadTasksScheduled();
-  }
-
-  Future<void> _loadTasksScheduled() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    DateTime today = DateTime.now();
-    String todayKey = '${today.year}-${today.month}-${today.day}';
-
-    setState(() {
-      tasksScheduled = prefs.getBool(todayKey) ?? false;
+    updateProgress();
+    _scrollController = ScrollController();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToToday();
     });
-  }
-
-  Future<void> _setTasksScheduled(bool value) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    DateTime today = DateTime.now();
-    String todayKey = '${today.year}-${today.month}-${today.day}';
-    await prefs.setBool(todayKey, value);
   }
 
   @override
   void dispose() {
-    for (var controller in taskWidgets) {
-      controller.dispose();
-    }
+    _scrollController.dispose();
     super.dispose();
   }
 
-  int countCompletedTasks() {
-    return isCheckedToDo.where((isChecked) => isChecked).length;
+  void _scrollToToday() {
+    double targetScrollOffset = (selectedIndex - 2) * 85.0;
+    _scrollController.animateTo(
+      targetScrollOffset,
+      duration: Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
   }
 
-  Stream<Map<String, bool>> getPlanToDoStream() async* {
-    User? currentUser = FirebaseAuth.instance.currentUser;
 
-    if (currentUser != null) {
-      yield* FirebaseFirestore.instance
-          .collection('users')
-          .doc(currentUser.uid)
-          .snapshots()
-          .map((snapshot) {
-        if (snapshot.exists) {
-          Map<String, dynamic>? data = snapshot.data() as Map<String, dynamic>?;
 
-          if (data != null && data.containsKey('planToDo')) {
-            Map<String, dynamic> planToDoData = data['planToDo'];
-            if (planToDoData.containsKey('date')) {
-              DateTime storedDate = DateTime.parse(planToDoData['date']);
-              DateTime today = DateTime.now();
-              if (storedDate.year == today.year &&
-                  storedDate.month == today.month &&
-                  storedDate.day == today.day &&
-                  planToDoData.containsKey('tasks')) {
-                return Map<String, bool>.from(planToDoData['tasks']);
-              }
-            }
-          }
-        }
-        return {};
-      });
-    } else {
-      yield {};
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            physics: BouncingScrollPhysics(),
-            child: Container(
-              margin: const EdgeInsets.only(left: 30, right: 30, top: 50),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TodayWidget(),
-                  Text(
-                    tasksScheduled
-                      ? 'Звіт за сьогодні сформовано.\n\nЗавтра тут з\'являться нові задачі'
-                      : 'Створіть звіт',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 30,
-                        color: Colors.black),
-                  ),
-                  StreamBuilder<Map<String, bool>>(
-                    stream: getPlanToDoStream(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      }
-
-                      planToDo = snapshot.data ?? {};
-                      isCheckedToDo = planToDo.values.toList();
-
-                      return planToDo.isNotEmpty
-                          ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 20),
-                          const Text(
-                            'Відмітьте виконане за день',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 22,
-                                color: Colors.black),
-                          ),
-                          const SizedBox(height: 10),
-                          ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: planToDo.length,
-                            itemBuilder: (context, index) {
-                              String task = planToDo.keys.elementAt(index);
-                              bool isChecked = isCheckedToDo[index];
-
-                              return CheckboxListTile(
-                                title: Text(
-                                  task,
-                                  style: const TextStyle(color: Colors.black),
-                                ),
-                                value: isChecked,
-                                onChanged: (bool? value) {
-                                  setState(() {
-                                    isCheckedToDo[index] = value ?? false;
-                                  });
-                                  UserService.updateTaskStatus(task, value ?? false);
-                                },
-                                controlAffinity: ListTileControlAffinity.leading,
-                                activeColor: Colors.black,
-                                checkColor: Colors.white,
-                              );
-                            },
-                          ),
-                        ],
-                      )
-                          : Text(
-                            tasksScheduled
-                              ? ''
-                              : 'Ви не поставили задачі на сьогодні. Заплануйте їх на завтра',
-                          style: TextStyle(fontSize: 20));
+      body: SingleChildScrollView(
+        child: Container(
+          margin: EdgeInsets.only(top: 70),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                height: 100,
+                margin: EdgeInsets.only(bottom: 40),
+                child: ListView.builder(
+                  controller: _scrollController,
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 7,
+                  itemBuilder: (context, index) {
+                    bool isSelected = selectedIndex == index;
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedIndex = index;
+                          updateProgress();
+                        });
+                      },
+                      child: DayInCalendar(isSelected: isSelected, index: index),
+                    );
+                  },
+                ),
+              ),
+        
+              DayliLinearProgress(progress: progress),
+              if(selectedIndex == 5)
+              GestureDetector(
+                onTap: (){
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AddNewTaskDialog(isToday: true);
                     },
-                  ),
-                  const SizedBox(height: 30),
-                  tasksScheduled
-                  ? SizedBox()
-                  : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        DateTime.now().weekday == DateTime.friday || DateTime.now().weekday == DateTime.saturday
-                            ? 'Плануйте на понеділок'
-                            : 'Заплануйте роботу на завтра',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 22,
-                          color: Colors.black,
-                        ),
+                  );
+                },
+                child: Container(
+                  width: screenSize.width,
+                  height: 60,
+                  margin: EdgeInsets.only(left: 15, right: 15, top: 20, bottom: 10),
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(30)),
+                    color: Colors.white,
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xfff0f0f7),
+                        Color(0xfff0f1f8),
+                      ],
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.4),
+                        spreadRadius: 3,
+                        blurRadius: 10,
+                        offset: Offset(10, 10),
                       ),
-                      const SizedBox(height: 10),
-                      ListView.builder(
-                        padding: const EdgeInsets.only(top: 20.0),
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: taskWidgets.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 20),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey.withOpacity(0.3),
-                                      borderRadius: BorderRadius.circular(6.0),
-                                    ),
-                                    child: TextField(
-                                      controller: taskWidgets[index],
-                                      decoration: InputDecoration(
-                                        suffixIcon: index == taskWidgets.length - 1
-                                            ? Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            IconButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  taskWidgets.removeAt(index);
-                                                });
-                                              },
-                                              icon: const Icon(Icons.remove_circle_outline),
-                                            ),
-                                            IconButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  taskWidgets.add(TextEditingController());
-                                                });
-                                              },
-                                              icon: const Icon(Icons.add_circle_outline),
-                                            ),
-                                          ],
-                                        )
-                                            : IconButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              taskWidgets.removeAt(index);
-                                            });
-                                          },
-                                          icon: const Icon(Icons.remove_circle_outline),
-                                        ),
-                                        hintText: 'Завдання',
-                                        hintStyle: const TextStyle(
-                                            fontSize: 16, fontWeight: FontWeight.bold),
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(6.0),
-                                          borderSide: BorderSide.none,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
+                      BoxShadow(
+                        color: Colors.white.withOpacity(0.8),
+                        spreadRadius: 0,
+                        blurRadius: 10,
+                        offset: Offset(-10, -8),
                       ),
                     ],
                   ),
-              SizedBox(
-                height: WidgetsBinding.instance.window.viewInsets.bottom / WidgetsBinding.instance.window.devicePixelRatio,
-              )
-                ],
-              ),
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 15.0),
-              child: ElevatedButton(
-                onPressed :() {
-                  List<String> tasks = taskWidgets.map((controller) => controller.text).toList();
-                  ReportModel newReport = ReportModel(
-                    date: DateTime.now(),
-                    countOfTasks: planToDo.length,
-                    doneTasks: countCompletedTasks(),
-                    plansToDo: tasks,
-                  );
-                  ReportService.saveReport(newReport);
-                  UserService.setPlanToDo(tasks);
-                  for (var controller in taskWidgets) {
-                    controller.clear();
-                  }
-                  setState(() {
-                    taskWidgets.clear();
-                    taskWidgets.add(TextEditingController());
-                    tasksScheduled = true;
-                  });
-                  _setTasksScheduled(true);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                ),
-                child: Container(
-                  margin: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-                  child: const Text(
-                    'Сформувати звіт',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                    ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Додати нову задачу',
+                        style: Theme.of(context).textTheme.labelMedium,
+                      )
+
+                    ],
                   ),
                 ),
               ),
-            ),
+              TasksListView(day: _getSelectedDate(selectedIndex),),
+        
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

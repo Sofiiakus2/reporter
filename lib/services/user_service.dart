@@ -122,7 +122,7 @@ class UserService {
     });
   }
 
-  Stream<Map<String, bool>> getPlanToDoStream() async* {
+  Stream<List<Map<String, dynamic>>> getPlanToDoStream(DateTime day) async* {
     User? currentUser = FirebaseAuth.instance.currentUser;
 
     if (currentUser != null) {
@@ -135,90 +135,119 @@ class UserService {
           Map<String, dynamic>? data = snapshot.data() as Map<String, dynamic>?;
 
           if (data != null && data.containsKey('planToDo')) {
-            Map<String, dynamic> planToDoData = data['planToDo'];
-            if (planToDoData.containsKey('date')) {
-              DateTime storedDate = DateTime.parse(planToDoData['date']);
-              DateTime today = DateTime.now();
-              if (storedDate.year == today.year &&
-                  storedDate.month == today.month &&
-                  storedDate.day == today.day &&
-                  planToDoData.containsKey('tasks')) {
-                return Map<String, bool>.from(planToDoData['tasks']);
+            List<dynamic> planToDoArray = data['planToDo'];
+
+            List<Map<String, dynamic>> tasksForToday = [];
+
+            for (var plan in planToDoArray) {
+              if (plan.containsKey('date')) {
+                DateTime storedDate = DateTime.parse(plan['date']);
+
+                if (storedDate.year == day.year &&
+                    storedDate.month == day.month &&
+                    storedDate.day == day.day &&
+                    plan.containsKey('tasks')) {
+                  Map<String, dynamic> tasks = plan['tasks'];
+                  tasksForToday.add({
+                    'task': tasks['task'],
+                    'description': tasks['description'],
+                    'completed': tasks['completed'],
+                  });
+                }
               }
             }
+
+            return tasksForToday;
           }
         }
-        return {};
+        return [];
       });
     } else {
-      yield {};
+      yield [];
     }
   }
 
+  static Future<List<Map<String, dynamic>>> getPlanToDo(DateTime targetDate) async {
+    try {
+      User? currentUser = _auth.currentUser;
+      DocumentSnapshot userDoc = await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .get();
 
+      if (userDoc.exists) {
+        Map<String, dynamic>? data = userDoc.data() as Map<String, dynamic>?;
 
-  static Future<Map<String, bool>> getPlanToDo(String userId) async {
-    try   {
+        if (data != null && data.containsKey('planToDo')) {
+          List<dynamic> planToDoArray = data['planToDo'];
+          List<Map<String, dynamic>> tasksForTargetDate = [];
+
+          for (var plan in planToDoArray) {
+            if (plan.containsKey('date')) {
+              DateTime storedDate = DateTime.parse(plan['date']);
+
+              if (storedDate.year == targetDate.year &&
+                  storedDate.month == targetDate.month &&
+                  storedDate.day == targetDate.day &&
+                  plan.containsKey('tasks')) {
+                Map<String, dynamic> tasks = plan['tasks'];
+                tasksForTargetDate.add({
+                  'task': tasks['task'],
+                  'description': tasks['description'],
+                  'completed': tasks['completed'],
+                });
+              }
+            }
+          }
+
+          return tasksForTargetDate; // Повертаємо список задач для вказаної дати
+        }
+        return [];
+      } else {
+        throw Exception("User document does not exist");
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<void> setPlanToDo(String task, String description, DateTime day) async {
+    User? currentUser = _auth.currentUser;
+
+    if (currentUser != null) {
+
+      Map<String, dynamic> newPlan = {
+        'date': day.toIso8601String(),
+        'tasks': {
+          'task': task,
+          'description': description,
+          'completed': false,
+        },
+      };
+
+      try {
+        // Отримуємо поточний масив планів
         DocumentSnapshot userDoc = await _firestore
             .collection('users')
-            .doc(userId)
+            .doc(currentUser.uid)
             .get();
+
+        List<dynamic> planToDoArray = [];
 
         if (userDoc.exists) {
           Map<String, dynamic>? data = userDoc.data() as Map<String, dynamic>?;
 
           if (data != null && data.containsKey('planToDo')) {
-            Map<String, dynamic> planToDoData = data['planToDo'];
-
-            if (planToDoData.containsKey('date')) {
-              DateTime storedDate = DateTime.parse(planToDoData['date']);
-              DateTime today = DateTime.now();
-
-              if (storedDate.year == today.year &&
-                  storedDate.month == today.month &&
-                  storedDate.day == today.day) {
-                if (planToDoData.containsKey('tasks')) {
-                  Map<String, bool> planToDo = Map<String, bool>.from(planToDoData['tasks']);
-                  return planToDo;
-                }
-              }
-            }
+            planToDoArray = List<dynamic>.from(data['planToDo']);
           }
-          return {};
-        } else {
-          throw Exception("User document does not exist");
         }
-      } catch (e) {
-        rethrow;
-      }
 
-  }
+        // Додаємо новий план до масиву
+        planToDoArray.add(newPlan);
 
-  static Future<void> setPlanToDo(List<String> tasks) async {
-    User? currentUser = _auth.currentUser;
-
-    if (currentUser != null) {
-      DateTime now = DateTime.now();
-      DateTime scheduledDate;
-
-      if (now.weekday == DateTime.friday) {
-        scheduledDate = now.add(Duration(days: 3));
-      } else if(now.weekday == DateTime.saturday){
-        scheduledDate = now.add(Duration(days: 2));
-      } else {
-        scheduledDate = now.add(Duration(days: 1));
-      }
-
-      Map<String, dynamic> planToDoData = {
-        'date': scheduledDate.toIso8601String(),
-        'tasks': {
-          for (var task in tasks) task: false,
-        },
-      };
-
-      try {
+        // Оновлюємо документ користувача з новим масивом планів
         await _firestore.collection('users').doc(currentUser.uid).update({
-          'planToDo': planToDoData,
+          'planToDo': planToDoArray,
         });
       } catch (e) {
         rethrow;
@@ -262,7 +291,7 @@ class UserService {
     return false;
   }
 
-  static Future<void> updateTaskStatus(String task, bool isCompleted) async {
+  static Future<void> updateTaskStatus(String title, bool isCompleted) async {
     User? currentUser = _auth.currentUser;
 
     if (currentUser != null) {
@@ -276,14 +305,20 @@ class UserService {
             Map<String, dynamic>? planToDoData = userSnapshot.data() as Map<String, dynamic>?;
 
             if (planToDoData != null && planToDoData.containsKey('planToDo')) {
-              Map<String, dynamic> tasks = planToDoData['planToDo']['tasks'];
+              List<dynamic> listPlan = planToDoData['planToDo'];
 
-              tasks[task] = isCompleted;
+              for(var item in listPlan){
+                Map<String, dynamic> task = item['tasks'];
+                if(task['task'] == title){
+                  task['completed'] = isCompleted;
 
+                }
+              }
               transaction.update(userDoc, {
-                'planToDo.tasks': tasks,
-                'planToDo.lastModified': FieldValue.serverTimestamp(),
+                'planToDo': listPlan,
               });
+
+
             }
           }
         });

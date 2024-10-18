@@ -21,7 +21,7 @@ class _MainProgresViewState extends State<MainProgresView> with SingleTickerProv
   Timer? _timer;
 
   Future<void> _updateProgress() async {
-    double progress1 = await StatisticService.countMyTodayProgress();
+    double progress1 = await StatisticService.countMyProgressForDay(DateTime.now());
     setState(() {
       progress = progress1;
       updateProgress(progress);

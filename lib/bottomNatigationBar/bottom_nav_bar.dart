@@ -5,6 +5,7 @@ import 'package:reporter/theme.dart';
 import '../analitik/analitik_page.dart';
 import '../home/home_page.dart';
 import '../profile/profile_page.dart';
+import '../tasks/adding_new_tasks/add_new_task_dialog.dart';
 import '../tasks/tasks_page.dart';
 
 class BottomNavBar extends StatefulWidget {
@@ -46,7 +47,13 @@ class _BottomNavBarState extends State<BottomNavBar> {
           padding: const EdgeInsets.all(4.0),
           child: FloatingActionButton(
             onPressed: () {
-             // AuthService.clearLoginCredentials();
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AddNewTaskDialog(isToday: false,);
+                },
+              );
+
               setState(() {
                 if(isTapped){
                   buttonLocation = FloatingActionButtonLocation.miniCenterDocked;
