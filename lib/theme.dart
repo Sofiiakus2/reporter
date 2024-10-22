@@ -40,6 +40,11 @@ final textTheme = TextTheme(
       fontWeight: FontWeight.w600,
       color: Colors.black
   ),
+  titleLarge: GoogleFonts.montserrat(
+      fontSize: 26,
+      fontWeight: FontWeight.w700,
+      color: backgroundColor
+  ),
 
   labelSmall: GoogleFonts.montserrat(
       fontSize: 16,
@@ -49,6 +54,11 @@ final textTheme = TextTheme(
   labelMedium: GoogleFonts.montserrat(
       fontSize: 18,
       fontWeight: FontWeight.w600,
+      color: Colors.black
+  ),
+  labelLarge: GoogleFonts.montserrat(
+      fontSize: 30,
+      fontWeight: FontWeight.w800,
       color: Colors.black
   ),
   bodySmall: GoogleFonts.montserrat(

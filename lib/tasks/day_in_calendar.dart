@@ -8,7 +8,7 @@ class DayInCalendar extends StatelessWidget {
   final int index;
   DateTime now = DateTime.now();
 
-  String getDayOfWeek(DateTime date) {
+  static String getDayOfWeek(DateTime date) {
     List<String> days = ['НД', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ','СБ'];
     return days[date.weekday % 7];
   }

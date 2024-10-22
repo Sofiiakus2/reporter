@@ -1,10 +1,12 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:reporter/home/progress_painter.dart';
 
 import '../services/statistic_service.dart';
 import '../theme.dart';
+import 'avatar_block.dart';
 
 class MainProgresView extends StatefulWidget {
   const MainProgresView({super.key});
@@ -21,7 +23,9 @@ class _MainProgresViewState extends State<MainProgresView> with SingleTickerProv
   Timer? _timer;
 
   Future<void> _updateProgress() async {
-    double progress1 = await StatisticService.countMyProgressForDay(DateTime.now());
+    FirebaseAuth _auth = FirebaseAuth.instance;
+    User? currentUser = _auth.currentUser;
+    double progress1 = await StatisticService.countMyProgressForDay(DateTime.now(), currentUser!.uid);
     setState(() {
       progress = progress1;
       updateProgress(progress);
@@ -75,47 +79,7 @@ class _MainProgresViewState extends State<MainProgresView> with SingleTickerProv
     return Stack(
       alignment: Alignment.center,
       children: [
-        Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.5),
-                blurRadius: 25,
-                spreadRadius: 1,
-              ),
-            ],
-          ),
-          child: CircleAvatar(
-            radius: 120,
-            backgroundColor: thirdColor,
-            child: ClipOval(
-              child: SizedBox(
-                width: 240,
-                height: 240,
-                child: Image.network('https://e2.hespress.com/wp-content/uploads/2022/01/E_wooELVkAM6Sun-800x600.jpeg',
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-          ),
-        ),
-        Container(
-          width: 240,
-          height: 240,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              begin: Alignment.bottomCenter,
-              end: Alignment.topCenter,
-              colors: [
-                primaryColor.withOpacity(0.8),
-                Colors.transparent,
-              ],
-              stops: [0.0, 1.0],
-            ),
-          ),
-        ),
+        AvatarBlock(),
         SizedBox(
           height: 300,
           width: 300,

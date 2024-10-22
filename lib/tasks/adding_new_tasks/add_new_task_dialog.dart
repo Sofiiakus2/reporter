@@ -94,6 +94,7 @@ class AddNewTaskDialog extends StatelessWidget {
           onPressed: () {
             if (_taskController.text.isNotEmpty && _descriptionController.text.isNotEmpty) {
               UserService.setPlanToDo(_taskController.text, _descriptionController.text, day);
+              Navigator.pop(context);
             }
           },
           style: ButtonStyle(

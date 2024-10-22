@@ -167,12 +167,11 @@ class UserService {
     }
   }
 
-  static Future<List<Map<String, dynamic>>> getPlanToDo(DateTime targetDate) async {
+  static Future<List<Map<String, dynamic>>> getPlanToDo(DateTime targetDate, String userId) async {
     try {
-      User? currentUser = _auth.currentUser;
       DocumentSnapshot userDoc = await _firestore
           .collection('users')
-          .doc(currentUser!.uid)
+          .doc(userId)
           .get();
 
       if (userDoc.exists) {
@@ -199,8 +198,7 @@ class UserService {
               }
             }
           }
-
-          return tasksForTargetDate; // Повертаємо список задач для вказаної дати
+          return tasksForTargetDate;
         }
         return [];
       } else {

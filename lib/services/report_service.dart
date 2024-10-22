@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:reporter/models/user_model.dart';
 import '../models/report_model.dart';
 
 class ReportService {
@@ -140,28 +141,23 @@ class ReportService {
   }
 
 
-  static Stream<List<ReportModel>> getReportsForAdminStream() async* {
+  static Stream<List<UserModel>> getReportsForAdminStream() async* {
     User? currentUser = _auth.currentUser;
 
     if (currentUser != null) {
       try {
         yield* _firestore.collection('users').snapshots().asyncMap((snapshot) {
-          List<ReportModel> reports = [];
+          List<UserModel> users = [];
 
           for (var userDoc in snapshot.docs) {
             if (userDoc.id != currentUser.uid) {
               Map<String, dynamic>? userData = userDoc.data() as Map<String, dynamic>?;
-              List<dynamic>? reportsData = userData?['reports'] as List<dynamic>?;
 
-              if (reportsData != null) {
-                reports.addAll(
-                  reportsData.map((report) => ReportModel.fromJson(report as Map<String, dynamic>)).toList(),
-                );
-              }
+              users.add(UserModel.fromJson(userData!));
             }
           }
 
-          return reports;
+          return users;
         });
       } catch (e) {
         Exception('Error fetching reports: $e');

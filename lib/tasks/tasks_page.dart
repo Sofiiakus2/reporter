@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:reporter/home/tasks_list_view.dart';
 import 'package:reporter/tasks/day_in_calendar.dart';
@@ -24,7 +25,9 @@ class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMix
 
   Future<void> updateProgress() async {
     DateTime selectedDate = _getSelectedDate(selectedIndex);
-    double progress1 = await StatisticService.countMyProgressForDay(selectedDate);
+    FirebaseAuth _auth = FirebaseAuth.instance;
+    User? currentUser = _auth.currentUser;
+    double progress1 = await StatisticService.countMyProgressForDay(selectedDate, currentUser!.uid);
     setState(() {
       progress = progress1;
     });

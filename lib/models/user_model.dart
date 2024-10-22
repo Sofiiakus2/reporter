@@ -10,7 +10,6 @@ class UserModel{
   final Map<String, bool>? plansToDo;
   final int? countOfTasks;
   final int? countOfDoneTasks;
-  final ReportModel? todayReport;
 
   UserModel({
     this.id,
@@ -22,6 +21,21 @@ class UserModel{
     this.plansToDo,
     this.countOfTasks,
     this.countOfDoneTasks,
-    this.todayReport
+
 });
+
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
+      id: json['id'] as String?,
+      role: json['role'] as String?,
+      name: json['name'] as String?,
+      department: json['department'] as String?,
+      email: json['email'] as String,
+      plansToDo: (json['plansToDo'] as Map<String, dynamic>?)
+          ?.map((key, value) => MapEntry(key, value as bool)),
+      countOfTasks: json['countOfTasks'] as int?,
+      countOfDoneTasks: json['countOfDoneTasks'] as int?,
+
+    );
+  }
 }

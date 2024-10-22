@@ -1,3 +1,5 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reporter/models/user_model.dart';
 import 'package:reporter/services/report_service.dart';
@@ -7,34 +9,12 @@ import '../models/report_model.dart';
 
 class StatisticService{
 
-  static Future<double> countMyProgressForDay(DateTime targetDate) async {
+  static FirebaseAuth _auth = FirebaseAuth.instance;
 
-     List<Map<String, dynamic>> planForDay = await UserService.getPlanToDo(targetDate);
+  static Future<double> countMyProgressForDay(DateTime targetDate, String userId) async {
 
-      if (planForDay.isEmpty) {
-        Stream<List<ReportModel>> reportsStream = ReportService.getReportsStream();
-        List<ReportModel> reports = await reportsStream.first;
+     List<Map<String, dynamic>> planForDay = await UserService.getPlanToDo(targetDate, userId);
 
-        ReportModel dayReport = reports.firstWhere(
-              (report) => report.date.year == targetDate.year &&
-              report.date.month == targetDate.month &&
-              report.date.day == targetDate.day,
-          orElse: () => ReportModel(
-            date: targetDate,
-            countOfTasks: 0,
-            doneTasks: 0,
-            plansToDo: [],
-          ),
-        );
-
-        if (dayReport.countOfTasks > 0) {
-          return dayReport.doneTasks / dayReport.countOfTasks;
-        } else {
-          return 0.0;
-        }
-      }
-
-      // Count completed tasks
       int completedTasks = 0;
       planForDay.forEach((task) {
         if (task['completed'] == true) {
@@ -42,20 +22,62 @@ class StatisticService{
         }
       });
 
-      // Return the progress
       if (completedTasks == 0) {
         return 0.0;
       } else {
         return completedTasks / planForDay.length;
       }
 
+  }
 
-    return 0.0;
+  static Future<Map<String, dynamic>> countMyPreviousWeekProgress() async {
+    double progress = 0.0;
+    int countOfDoneTasks = 0;
+    int countOfTasks = 0;
+
+    User? currentUser = _auth.currentUser;
+    DateTime now = DateTime.now();
+    DateTime lastMonday = now.subtract(Duration(days: now.weekday + 6));
+    DateTime lastFriday = lastMonday.add(Duration(days: 4));
+
+    Stream<UserModel?> userDataStream = UserService().getUserData();
+
+    await for (UserModel? userModel in userDataStream) {
+      if (userModel != null) {
+        for (DateTime day = lastMonday; day.isBefore(lastFriday) || day.isAtSameMomentAs(lastFriday); day = day.add(Duration(days: 1))) {
+          List<Map<String, dynamic>> planForDay = await UserService.getPlanToDo(day, currentUser!.uid);
+
+          countOfTasks += planForDay.length;
+          planForDay.forEach((task) {
+            if (task['completed'] == true) {
+              countOfDoneTasks++;
+            }
+          });
+
+
+          if (countOfTasks > 0) {
+            progress = countOfDoneTasks / countOfTasks;
+          }
+        }
+
+      }
+
+      break;
+    }
+
+    return {
+      'progress': progress,
+      'countOfDoneTasks': countOfDoneTasks,
+      'countOfTasks': countOfTasks,
+    };
   }
 
 
 
-  // static Future<double> countMyMonthProgress() async {
+
+
+
+// static Future<double> countMyMonthProgress() async {
   //   double progress = 0.0;
   //
   //   Stream<UserModel?> userDataStream = UserService().getUserData();
