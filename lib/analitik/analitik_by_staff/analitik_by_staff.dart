@@ -17,7 +17,6 @@ class AnalitikByStaff extends StatefulWidget {
 class _AnalitikByStaffState extends State<AnalitikByStaff> {
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
     return StreamBuilder<List<UserModel>>(
       stream: ReportService.getReportsForAdminStream(),
         builder: (context, snapshot){

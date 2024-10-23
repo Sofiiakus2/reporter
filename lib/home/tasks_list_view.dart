@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:reporter/home/task_block_view.dart';
 import '../services/user_service.dart';
@@ -6,11 +7,13 @@ class TasksListView extends StatelessWidget {
   TasksListView({super.key, required this.day});
   final DateTime day;
   DateTime now = DateTime.now();
+  String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<Map<String, dynamic>>>(
-      stream: UserService().getPlanToDoStream(day),
+      stream: UserService().getPlanToDoStream(day, currentUserId),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');

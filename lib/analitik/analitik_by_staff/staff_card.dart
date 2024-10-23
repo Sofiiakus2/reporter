@@ -1,5 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:reporter/analitik/analitik_by_staff/analitik_by_person.dart';
 
 import '../../models/user_model.dart';
 import '../../services/statistic_service.dart';
@@ -37,7 +40,7 @@ class _StaffCardState extends State<StaffCard> {
     getProgress();
     return GestureDetector(
       onTap: (){
-
+        Get.to(AnalitikByPerson(userId: widget.user.id!,));
       },
       child: AnimatedContainer(
         width: screenSize.width,

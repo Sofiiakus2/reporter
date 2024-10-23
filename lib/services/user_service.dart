@@ -122,13 +122,11 @@ class UserService {
     });
   }
 
-  Stream<List<Map<String, dynamic>>> getPlanToDoStream(DateTime day) async* {
-    User? currentUser = FirebaseAuth.instance.currentUser;
+  Stream<List<Map<String, dynamic>>> getPlanToDoStream(DateTime day, String userId) async* {
 
-    if (currentUser != null) {
-      yield* FirebaseFirestore.instance
+    yield* FirebaseFirestore.instance
           .collection('users')
-          .doc(currentUser.uid)
+          .doc(userId)
           .snapshots()
           .map((snapshot) {
         if (snapshot.exists) {
@@ -162,9 +160,7 @@ class UserService {
         }
         return [];
       });
-    } else {
-      yield [];
-    }
+
   }
 
   static Future<List<Map<String, dynamic>>> getPlanToDo(DateTime targetDate, String userId) async {

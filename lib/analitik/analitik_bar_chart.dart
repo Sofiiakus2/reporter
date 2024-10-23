@@ -7,9 +7,10 @@ import '../tasks/day_in_calendar.dart';
 import '../theme.dart';
 
 class AnalitikBarChart extends StatefulWidget {
-  const AnalitikBarChart({super.key, required this.isWeek, required this.onDateSelected,});
+  const AnalitikBarChart({super.key, required this.isWeek, required this.onDateSelected, required this.userId,});
   final bool isWeek;
   final Function(DateTime) onDateSelected;
+  final String userId;
 
   @override
   State<AnalitikBarChart> createState() => _AnalitikBarChartState();
@@ -29,7 +30,7 @@ class _AnalitikBarChartState extends State<AnalitikBarChart> {
     countOfDays = days.length;
     List<double> progress = [];
     for (int i = 0; i < 7; i++) {
-      progress.add((await StatisticService.countMyProgressForDay(days[i], currentUser!.uid) * 100));
+      progress.add((await StatisticService.countMyProgressForDay(days[i], widget.userId) * 100));
     }
 
     setState(() {
