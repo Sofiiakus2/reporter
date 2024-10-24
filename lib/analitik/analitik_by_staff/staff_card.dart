@@ -1,7 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:reporter/analitik/analitik_by_staff/analitik_by_person.dart';
 
 import '../../models/user_model.dart';

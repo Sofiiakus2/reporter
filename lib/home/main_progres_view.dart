@@ -23,8 +23,8 @@ class _MainProgresViewState extends State<MainProgresView> with SingleTickerProv
   Timer? _timer;
 
   Future<void> _updateProgress() async {
-    FirebaseAuth _auth = FirebaseAuth.instance;
-    User? currentUser = _auth.currentUser;
+    FirebaseAuth auth = FirebaseAuth.instance;
+    User? currentUser = auth.currentUser;
     double progress1 = await StatisticService.countMyProgressForDay(DateTime.now(), currentUser!.uid);
     setState(() {
       progress = progress1;

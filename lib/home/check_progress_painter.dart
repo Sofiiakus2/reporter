@@ -28,7 +28,7 @@ class CheckProgressPainter extends CustomPainter {
     canvas.drawArc(rect, 0, 3.14 * 2, false, backgroundPaint);
 
     double sweepAngle = progress * 3.14 * 2;
-    canvas.drawArc(rect, -3.14 / 2, sweepAngle, false, progressPaint); // Sweeping arc for progress
+    canvas.drawArc(rect, -3.14 / 2, sweepAngle, false, progressPaint);
   }
 
   @override

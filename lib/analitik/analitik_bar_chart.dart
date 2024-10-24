@@ -22,7 +22,7 @@ class _AnalitikBarChartState extends State<AnalitikBarChart> {
   List<double>? progressData;
   int countOfDays = 0;
   bool isLoading = true;
-  FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<void> fetchDataWeek() async {
     User? currentUser = _auth.currentUser;
@@ -61,9 +61,7 @@ class _AnalitikBarChartState extends State<AnalitikBarChart> {
   void getSelectedDate() {
     if (touchedGroupIndex != -1 && touchedGroupIndex < days.length) {
       DateTime selectedDate = days[touchedGroupIndex];
-      widget.onDateSelected(selectedDate); // Call the callback with the selected date
-    } else {
-      print('No valid date selected');
+      widget.onDateSelected(selectedDate);
     }
   }
 

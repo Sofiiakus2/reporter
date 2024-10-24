@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:reporter/analitik/analitik_by_staff/staff_card.dart';
 import 'package:reporter/models/user_model.dart';
 import 'package:reporter/services/report_service.dart';
-import 'package:reporter/theme.dart';
 
-import '../../models/report_model.dart';
 
 class AnalitikByStaff extends StatefulWidget {
   const AnalitikByStaff({super.key, required this.day});

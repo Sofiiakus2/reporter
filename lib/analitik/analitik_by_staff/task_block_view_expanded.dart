@@ -29,10 +29,6 @@ class _TaskBlockViewExpandedState extends State<TaskBlockViewExpanded> with Sing
     super.initState();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,7 +98,7 @@ class _TaskBlockViewExpandedState extends State<TaskBlockViewExpanded> with Sing
                 ],
               ),
               if (_isExpanded)
-                Container(
+                SizedBox(
                   width: screenSize.width,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

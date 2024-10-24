@@ -2,7 +2,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:reporter/auth/enter/enter_page.dart';
 import 'package:reporter/auth/registration/registration_page.dart';
 import 'package:reporter/bottomNatigationBar/bottom_nav_bar.dart';
@@ -36,7 +35,6 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: lightTheme,
      initialRoute: '/',
-     // home: const BottomNavBar(),
       getPages: [
         GetPage(name: '/', page: () => const SplashScreen()),
         GetPage(name: '/enter', page: () => const EnterPage()),

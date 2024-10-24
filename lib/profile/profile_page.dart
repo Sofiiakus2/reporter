@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_circular_text/circular_text/model.dart';
-import 'package:flutter_circular_text/circular_text/widget.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:reporter/home/avatar_block.dart';
-import 'package:reporter/home/task_block_view.dart';
 import 'package:reporter/profile/weekly_personal_statistics.dart';
-import 'package:reporter/services/statistic_service.dart';
 import '../models/user_model.dart';
 import '../services/auth_service.dart';
 import '../services/user_service.dart';

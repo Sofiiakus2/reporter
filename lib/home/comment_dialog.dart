@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:reporter/theme.dart';
 
 class CommentDialog extends StatefulWidget {
-  CommentDialog({super.key});
+  const CommentDialog({super.key});
 
   @override
   State<CommentDialog> createState() => _CommentDialogState();

@@ -62,7 +62,6 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 }
                 isTapped = !isTapped;
               });
-              // Navigator.pushNamed(context, "/addPost");
             },
             elevation: 10,
             backgroundColor: primaryColor,
@@ -79,15 +78,13 @@ class _BottomNavBarState extends State<BottomNavBar> {
           tabBuilder: (int index, bool isActive){
             return Padding(
               padding: const EdgeInsets.all(20.0),
-              child: Container(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Icon(iconList[index],
-                  size: 32,
-                  color: isActive
-                    ? primaryColor
-                    : dividerColor)
-                ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(iconList[index],
+                size: 32,
+                color: isActive
+                  ? primaryColor
+                  : dividerColor)
               ),
 
             );
