@@ -7,11 +7,13 @@ class TaskBlockViewExpanded extends StatefulWidget {
     required this.title,
     required this.isChecked,
     required this.description,
+    required this.comment,
     required this.isToday,
   });
 
   final String title;
   final String description;
+  final String comment;
   bool isChecked;
   final bool isToday;
 
@@ -100,27 +102,30 @@ class _TaskBlockViewExpandedState extends State<TaskBlockViewExpanded> with Sing
                 ],
               ),
               if (_isExpanded)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 30),
-                    Text(
-                      'Додаткова інформація:',
-                      style: Theme.of(context).textTheme.labelMedium,
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      'Опис: ${widget.description}',
-                      style: Theme.of(context).textTheme.bodySmall,
-                      maxLines: _isExpanded ? null : 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      'Результат : Це може бути будь-яка інформація, яка буде показуватися при розширенні контейнера.',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ],
+                Container(
+                  width: screenSize.width,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 30),
+                      Text(
+                        'Додаткова інформація:',
+                        style: Theme.of(context).textTheme.labelMedium,
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        'Опис: ${widget.description}',
+                        style: Theme.of(context).textTheme.bodySmall,
+                        maxLines: _isExpanded ? null : 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        'Результат : ${widget.comment}',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
                 ),
             ],
           ),

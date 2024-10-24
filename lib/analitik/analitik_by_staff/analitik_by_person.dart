@@ -95,11 +95,12 @@ class _AnalitikByPersonState extends State<AnalitikByPerson> {
                         itemBuilder: (context, index) {
                           String task = planToDoList[index]['task'];
                           String description = planToDoList[index]['description'];
+                          String comment = planToDoList[index]['comment'] ?? '';
                           bool isChecked = planToDoList[index]['completed'] ?? false;
 
                           return Column(
                             children: [
-                              TaskBlockViewExpanded(title: task, description: description, isChecked: isChecked, isToday: false,),
+                              TaskBlockViewExpanded(title: task, description: description, isChecked: isChecked, isToday: false, comment: comment),
                               const SizedBox(height: 25),
                             ],
                           );

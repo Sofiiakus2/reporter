@@ -150,6 +150,7 @@ class UserService {
                     'task': tasks['task'],
                     'description': tasks['description'],
                     'completed': tasks['completed'],
+                    'comment': tasks['comment'] ?? '',
                   });
                 }
               }
@@ -285,7 +286,7 @@ class UserService {
     return false;
   }
 
-  static Future<void> updateTaskStatus(String title, bool isCompleted) async {
+  static Future<void> updateTaskStatus(String title, bool isCompleted, String? comment) async {
     User? currentUser = _auth.currentUser;
 
     if (currentUser != null) {
@@ -305,7 +306,7 @@ class UserService {
                 Map<String, dynamic> task = item['tasks'];
                 if(task['task'] == title){
                   task['completed'] = isCompleted;
-
+                  task['comment'] = comment ?? '';
                 }
               }
               transaction.update(userDoc, {

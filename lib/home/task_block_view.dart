@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:reporter/home/comment_dialog.dart';
 import '../services/user_service.dart';
 import '../theme.dart';
 import 'check_progress_painter.dart';
@@ -25,6 +26,16 @@ class _TaskBlockViewState extends State<TaskBlockView> with SingleTickerProvider
   late AnimationController _controller;
   late Animation<double> _progressAnimation;
 
+  void controllerCheck(){
+
+
+    if (widget.isChecked) {
+      _controller.forward();
+    } else{
+      _controller.reverse();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -35,12 +46,10 @@ class _TaskBlockViewState extends State<TaskBlockView> with SingleTickerProvider
 
     _progressAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller)
       ..addListener(() {
-        setState(() {});
+        if (mounted) {
+          setState(() {});
+        }
       });
-
-    if (widget.isChecked) {
-      _controller.forward();
-    }
   }
 
   @override
@@ -52,11 +61,11 @@ class _TaskBlockViewState extends State<TaskBlockView> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-
+    controllerCheck();
     return Container(
       width: screenSize.width,
       margin: EdgeInsets.symmetric(horizontal: 15),
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10), // Зміна padding для динамічної висоти
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(30)),
         color: Colors.white,
@@ -86,7 +95,6 @@ class _TaskBlockViewState extends State<TaskBlockView> with SingleTickerProvider
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Динамічна ширина тексту з переносом
           Flexible(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,19 +104,29 @@ class _TaskBlockViewState extends State<TaskBlockView> with SingleTickerProvider
                   widget.title,
                   style: Theme.of(context).textTheme.labelMedium,
                 ),
-                SizedBox(height: 5), // Невеликий відступ між текстами
+                SizedBox(height: 5),
                 Text(
                   widget.description,
                   style: Theme.of(context).textTheme.bodySmall,
-                  maxLines: null, // Дозволяє переносити текст на новий рядок
-                  overflow: TextOverflow.visible, // Текст буде розширювати блок
+                  maxLines: null,
+                  overflow: TextOverflow.visible,
                 ),
               ],
             ),
           ),
           GestureDetector(
-            onTap: () {
-              setState(() {
+            onTap: ()  async{
+              String? comment = '';
+              if(!widget.isChecked){
+                comment = await showDialog<String>(
+                  context: context,
+                  builder: (context) {
+                    return CommentDialog();
+                  },
+                );
+              }
+
+              setState(()   {
                 if (widget.isToday) {
                   widget.isChecked = !widget.isChecked;
                   if (widget.isChecked) {
@@ -116,7 +134,10 @@ class _TaskBlockViewState extends State<TaskBlockView> with SingleTickerProvider
                   } else {
                     _controller.reverse();
                   }
-                  UserService.updateTaskStatus(widget.title, widget.isChecked);
+
+                  UserService.updateTaskStatus(widget.title, widget.isChecked, comment!);
+
+
                 }
               });
             },

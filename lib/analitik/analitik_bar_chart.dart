@@ -40,7 +40,6 @@ class _AnalitikBarChartState extends State<AnalitikBarChart> {
   }
 
   Future<void> fetchDataMonth() async {
-    User? currentUser = _auth.currentUser;
     DateTime now = DateTime.now();
     List<double> progress = [];
     int daysInMonth = DateUtils.getDaysInMonth(now.year, now.month);
@@ -48,7 +47,7 @@ class _AnalitikBarChartState extends State<AnalitikBarChart> {
       DateTime day = DateTime(now.year, now.month, i);
       if (day.weekday >= DateTime.monday && day.weekday <= DateTime.friday) {
         days.add(day);
-        progress.add((await StatisticService.countMyProgressForDay(day, currentUser!.uid) * 100));
+        progress.add((await StatisticService.countMyProgressForDay(day, widget.userId) * 100));
       }
     }
 

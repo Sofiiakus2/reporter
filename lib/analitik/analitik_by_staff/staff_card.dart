@@ -40,7 +40,7 @@ class _StaffCardState extends State<StaffCard> {
     getProgress();
     return GestureDetector(
       onTap: (){
-        Get.to(AnalitikByPerson(userId: widget.user.id!,));
+        Get.to(() => AnalitikByPerson(userId: widget.user.id!,));
       },
       child: AnimatedContainer(
         width: screenSize.width,
