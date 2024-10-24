@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:reporter/models/user_model.dart';
 import 'package:reporter/services/auth_service.dart';
 
+import '../../theme.dart';
+
 
 class EnterPage extends StatefulWidget {
   const EnterPage({super.key});
@@ -18,38 +20,34 @@ class _EnterPageState extends State<EnterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Container(
           margin: const EdgeInsets.symmetric(horizontal: 30),
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
+                Text(
                   'Вхід',
-                  style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.labelLarge!.copyWith(fontWeight: FontWeight.w600)
                 ),
                 const SizedBox(
                   height: 60,
                 ),
                 TextField(
                   controller: emailController,
+                  style: Theme.of(context).textTheme.labelSmall,
                   decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintText: 'Email',
-                    hintStyle: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey),
+                    labelText: 'Email',
+                    labelStyle: Theme.of(context).textTheme.labelSmall,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(
-                        color: Colors.grey,
-                        width: 0.5,
+                      borderRadius: BorderRadius.circular(20.0),
+                      borderSide: const BorderSide(),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                      borderSide: BorderSide(
+                        color: primaryColor,
+                        width: 2.0,
                       ),
                     ),
                   ),
@@ -60,32 +58,19 @@ class _EnterPageState extends State<EnterPage> {
                 TextField(
                   controller: passwordController,
                   obscureText: !isPasswordVisible,
+                  style: Theme.of(context).textTheme.labelSmall,
                   decoration: InputDecoration(
-                    filled: true,
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        isPasswordVisible
-                            ? Icons.visibility
-                            : Icons.visibility_off,
-                        color: Colors.grey,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          isPasswordVisible = !isPasswordVisible;
-                        });
-                      },
-                    ),
-                    fillColor: Colors.white,
-                    hintText: 'Пароль',
-                    hintStyle: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey),
+                    labelText: 'Пароль',
+                    labelStyle: Theme.of(context).textTheme.labelSmall,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(
-                        color: Colors.grey,
-                        width: 0.5,
+                      borderRadius: BorderRadius.circular(20.0),
+                      borderSide: const BorderSide(),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                      borderSide: BorderSide(
+                        color: primaryColor,
+                        width: 2.0,
                       ),
                     ),
                   ),
@@ -103,23 +88,22 @@ class _EnterPageState extends State<EnterPage> {
                       Navigator.pushNamed(context, "/bottomNavBar");
                     }
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(primaryColor.withOpacity(0.7)),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18.0),
+                      ),
                     ),
                   ),
                   child: Container(
                       width: 160,
                       margin: const EdgeInsets.symmetric(
                           vertical: 15, horizontal: 20),
-                      child: const Center(
+                      child: Center(
                         child: Text(
                           'Увійти',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                          ),
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.white),
                         ),
                       )),
                 ),
@@ -130,23 +114,22 @@ class _EnterPageState extends State<EnterPage> {
                   onPressed: () {
                     Navigator.pushNamed(context, "/registration");
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(dividerColor),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18.0),
+                      ),
                     ),
                   ),
                   child: Container(
                       width: 160,
                       margin: const EdgeInsets.symmetric(
                           vertical: 15, horizontal: 20),
-                      child: const Center(
+                      child: Center(
                         child: Text(
                           'Реєстрація',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                          ),
+                          style: Theme.of(context).textTheme.labelSmall,
                         ),
                       )),
                 ),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:reporter/models/user_model.dart';
 import 'package:reporter/services/auth_service.dart';
 
+import '../../theme.dart';
+
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key});
@@ -20,7 +22,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 200),
@@ -29,31 +30,29 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
+                  Text(
                     'Реєстрація',
-                    style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold),
+                      style: Theme.of(context).textTheme.labelLarge!.copyWith(fontWeight: FontWeight.w600)
+
                   ),
                   const SizedBox(
                     height: 60,
                   ),
                   TextField(
                     controller: usernameController,
+                    style: Theme.of(context).textTheme.labelSmall,
                     decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: 'Ім\'я',
-                      hintStyle: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey),
+                      labelText: 'Ім\'я',
+                      labelStyle: Theme.of(context).textTheme.labelSmall,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                        borderSide: const BorderSide(
-                          color: Colors.grey,
-                          width: 0.5,
+                        borderRadius: BorderRadius.circular(20.0),
+                        borderSide: const BorderSide(),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                        borderSide: BorderSide(
+                          color: primaryColor,
+                          width: 2.0,
                         ),
                       ),
                     ),
@@ -63,19 +62,19 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   ),
                   TextField(
                     controller: emailController,
+                    style: Theme.of(context).textTheme.labelSmall,
                     decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: 'Email',
-                      hintStyle: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey),
+                      labelText: 'Email',
+                      labelStyle: Theme.of(context).textTheme.labelSmall,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                        borderSide: const BorderSide(
-                          color: Colors.grey,
-                          width: 0.5,
+                        borderRadius: BorderRadius.circular(20.0),
+                        borderSide: const BorderSide(),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                        borderSide: BorderSide(
+                          color: primaryColor,
+                          width: 2.0,
                         ),
                       ),
                     ),
@@ -85,8 +84,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   ),
                   TextField(
                     controller: passwordController,
+                    style: Theme.of(context).textTheme.labelSmall,
                     decoration: InputDecoration(
-                      filled: true,
+                      labelText: 'Пароль',
                       suffixIcon: IconButton(
                         icon: const Icon(
                           Icons.remove_red_eye_outlined,
@@ -94,41 +94,40 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         ),
                         onPressed: () {},
                       ),
-                      fillColor: Colors.white,
-                      hintText: 'Пароль',
-                      hintStyle: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey),
+                      labelStyle: Theme.of(context).textTheme.labelSmall,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                        borderSide: const BorderSide(
-                          color: Colors.grey,
-                          width: 0.5,
+                        borderRadius: BorderRadius.circular(20.0),
+                        borderSide: const BorderSide(),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                        borderSide: BorderSide(
+                          color: primaryColor,
+                          width: 2.0,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Checkbox(
-                        activeColor: Colors.black,
-                        value: isChecked,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            isChecked = value!;
-                          });
-                        },
-                      ),
-                      Text('я директор',
-                      style: TextStyle(fontSize: 16),)
-                    ],
-                  ),
+                  // const SizedBox(
+                  //   height: 20,
+                  // ),
+                  // Row(
+                  //   crossAxisAlignment: CrossAxisAlignment.center,
+                  //   mainAxisAlignment: MainAxisAlignment.center,
+                  //   children: [
+                  //     Checkbox(
+                  //       activeColor: Colors.black,
+                  //       value: isChecked,
+                  //       onChanged: (bool? value) {
+                  //         setState(() {
+                  //           isChecked = value!;
+                  //         });
+                  //       },
+                  //     ),
+                  //     Text('я директор',
+                  //     style: TextStyle(fontSize: 16),)
+                  //   ],
+                  // ),
                   const SizedBox(
                     height: 60,
                   ),
@@ -143,21 +142,21 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       AuthService.createUser(newUser);
                       Navigator.pushReplacementNamed(context, '/enter');
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(primaryColor.withOpacity(0.7)),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18.0),
+                        ),
                       ),
                     ),
                     child: Container(
                       margin: const EdgeInsets.symmetric(
                           vertical: 15, horizontal: 20),
-                      child: const Text(
+                      child: Text(
                         'Зареєструватися',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                        ),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.white),
+
                       ),
                     ),
                   ),
@@ -168,23 +167,23 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     onPressed: () {
                       Navigator.pushReplacementNamed(context, '/enter');
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(dividerColor),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18.0),
+                        ),
                       ),
                     ),
                     child: Container(
                         width: 160,
                         margin: const EdgeInsets.symmetric(
                             vertical: 15, horizontal: 20),
-                        child: const Center(
+                        child: Center(
                           child: Text(
                             'Увійти',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 18,
-                            ),
+                            style: Theme.of(context).textTheme.labelSmall,
+
                           ),
                         )),
                   ),
