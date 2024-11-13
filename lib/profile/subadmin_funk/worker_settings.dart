@@ -28,7 +28,7 @@ class _WorkerSettingsState extends State<WorkerSettings> {
       body: Container(
         margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
         child: FutureBuilder<String>(
-            future: userService.getUserDepartment(),
+            future: UserService.getUserDepartment(),
             builder: (context, snapshot){
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());

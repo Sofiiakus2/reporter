@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reporter/models/user_model.dart';
+import 'package:reporter/services/user_service.dart';
 import '../models/report_model.dart';
 
 class ReportService {
@@ -168,6 +169,42 @@ class ReportService {
     }
   }
 
+  static Stream<List<UserModel>> getReportsForSameDepartmentStream() async* {
+    User? currentUser = _auth.currentUser;
+
+    if (currentUser != null) {
+      try {
+        String? userDepartment = await UserService.getUserDepartment();
+
+        if (userDepartment != null) {
+          yield* _firestore
+              .collection('users')
+              .where('department', isEqualTo: userDepartment)
+              .snapshots()
+              .asyncMap((snapshot) {
+            List<UserModel> users = [];
+
+            for (var userDoc in snapshot.docs) {
+              if (userDoc.id != currentUser.uid) {
+                Map<String, dynamic>? userData = userDoc.data() as Map<String, dynamic>?;
+
+                users.add(UserModel.fromJson(userData!));
+              }
+            }
+
+            return users;
+          });
+        } else {
+          yield [];
+        }
+      } catch (e) {
+        print('Error fetching reports: $e');
+        yield [];
+      }
+    } else {
+      yield [];
+    }
+  }
 
 
 

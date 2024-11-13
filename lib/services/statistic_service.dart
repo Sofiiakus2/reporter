@@ -72,6 +72,69 @@ class StatisticService{
     };
   }
 
+  static Future<double> countTeamProgressForDay(DateTime targetDate, List<String> userIds) async {
+    int totalTasks = 0;
+    int completedTasks = 0;
+
+   // print('--------------------------------');
+  //  print(userIds.length);
+    for (String userId in userIds) {
+      List<Map<String, dynamic>> planForDay = await UserService.getPlanToDo(targetDate, userId);
+     // print('--${userId}--------${planForDay}--------${targetDate}---');
+      totalTasks += planForDay.length;
+
+    //  print('=========================');
+     // print(totalTasks);
+      for (var task in planForDay) {
+        if (task['completed'] == true) {
+          completedTasks++;
+        //  print('C $completedTasks');
+        }
+      }
+    }
+
+    if (totalTasks == 0) {
+      return 0.0;
+    } else {
+      return completedTasks / totalTasks;
+    }
+  }
+
+
+  static Future<double> countProgressForRole(DateTime targetDate, String userId, String role) async {
+    List<String> userIds = [];
+
+    if (role == 'admin') {
+      userIds = await UserService.getAllUserIds();
+    } else if (role == 'subadmin') {
+      String? department = await UserService.getUserDepartment();
+      if (department != null) {
+        userIds = await UserService.getUserIdsByDepartment(department);
+      }
+    }
+
+    int totalTasks = 0;
+    int completedTasks = 0;
+
+    for (String uid in userIds) {
+      List<Map<String, dynamic>> planForDay = await UserService.getPlanToDo(targetDate, uid);
+
+      totalTasks += planForDay.length;
+
+      for (var task in planForDay) {
+        if (task['completed'] == true) {
+          completedTasks++;
+        }
+      }
+    }
+
+    if (totalTasks == 0) {
+      return 0.0;
+    } else {
+      return completedTasks / totalTasks;
+    }
+  }
+
 
 
 

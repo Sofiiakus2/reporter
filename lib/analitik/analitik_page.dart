@@ -73,8 +73,8 @@ class _AnalitikPageState extends State<AnalitikPage> {
                           ])),
                   CustomDivider(),
 
-                   if(role == 'admin' )
-                     AnalitikByStaff(day: selectedDate!,)
+                   if(role == 'admin' || role == 'subadmin' )
+                     AnalitikByStaff(day: selectedDate!, role: role!,)
                 ],
               ),
             ),

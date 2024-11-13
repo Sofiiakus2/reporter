@@ -5,18 +5,31 @@ import 'package:reporter/services/report_service.dart';
 
 
 class AnalitikByStaff extends StatefulWidget {
-  const AnalitikByStaff({super.key, required this.day});
+  const AnalitikByStaff({super.key, required this.day, required this.role});
   final DateTime day;
+  final String role;
 
   @override
   State<AnalitikByStaff> createState() => _AnalitikByStaffState();
 }
 
 class _AnalitikByStaffState extends State<AnalitikByStaff> {
+  Stream<List<UserModel>>? _funk;
+
+  @override
+  void initState() {
+    super.initState();
+    if(widget.role == 'admin'){
+      _funk = ReportService.getReportsForAdminStream();
+    }else {
+      _funk = ReportService.getReportsForSameDepartmentStream();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<UserModel>>(
-      stream: ReportService.getReportsForAdminStream(),
+      stream: _funk,
         builder: (context, snapshot){
           if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');

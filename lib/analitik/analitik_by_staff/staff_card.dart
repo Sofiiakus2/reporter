@@ -83,7 +83,7 @@ class _StaffCardState extends State<StaffCard> {
                   backgroundImage: NetworkImage('https://recordcellar.ca/wp-content/uploads/2023/01/justinbieberchanges.jpg',),
                 ),
                 SizedBox(width: 20,),
-                Flexible(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -91,6 +91,7 @@ class _StaffCardState extends State<StaffCard> {
                       Text(
                         widget.user.name!,
                         style: Theme.of(context).textTheme.labelMedium,
+                        softWrap: false,
                       ),
                       SizedBox(height: 5),
                       Text(
@@ -102,7 +103,7 @@ class _StaffCardState extends State<StaffCard> {
                     ],
                   ),
                 ),
-                Expanded(child: SizedBox()),
+               // Expanded(child: SizedBox()),
                 Text(
                   '${(progress*100).toStringAsFixed(0)}%',
                   style: Theme.of(context).textTheme.labelMedium,

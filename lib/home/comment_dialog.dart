@@ -15,7 +15,13 @@ class _CommentDialogState extends State<CommentDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Введіть коментар',style: Theme.of(context).textTheme.labelMedium,),
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Введіть коментар',style: Theme.of(context).textTheme.labelMedium,),
+          Text('необов\'язково*',style: Theme.of(context).textTheme.labelSmall,),
+        ],
+      ),
       backgroundColor: backgroundColor,
       content:  TextField(
         controller: textController,
@@ -39,7 +45,7 @@ class _CommentDialogState extends State<CommentDialog> {
       actions: <Widget>[
         ElevatedButton(
           onPressed: () {
-            Navigator.of(context).pop(null);
+            Navigator.of(context).pop('');
           },
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all<Color>(dividerColor),

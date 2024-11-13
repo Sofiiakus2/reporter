@@ -27,7 +27,8 @@ class UserService {
   }
 
 
-  Future<String> getUserDepartment() async {
+
+  static Future<String> getUserDepartment() async {
     User? user = _auth.currentUser;
 
     if (user != null) {
@@ -40,6 +41,35 @@ class UserService {
     }
 
     return '';
+  }
+
+  static Future<List<String>> getAllUserIds() async {
+    try {
+      QuerySnapshot snapshot = await _firestore.collection('users').get();
+
+      List<String> userIds = snapshot.docs.map((doc) => doc.id).toList();
+
+      return userIds;
+    } catch (e) {
+      print("Error fetching all user IDs: $e");
+      return [];
+    }
+  }
+
+  static Future<List<String>> getUserIdsByDepartment(String department) async {
+    try {
+      QuerySnapshot snapshot = await _firestore
+          .collection('users')
+          .where('department', isEqualTo: department)
+          .get();
+
+      List<String> userIds = snapshot.docs.map((doc) => doc.id).toList();
+
+      return userIds;
+    } catch (e) {
+      print("Error fetching user IDs by department: $e");
+      return [];
+    }
   }
 
 
@@ -221,7 +251,6 @@ class UserService {
       };
 
       try {
-        // Отримуємо поточний масив планів
         DocumentSnapshot userDoc = await _firestore
             .collection('users')
             .doc(currentUser.uid)
@@ -237,10 +266,8 @@ class UserService {
           }
         }
 
-        // Додаємо новий план до масиву
         planToDoArray.add(newPlan);
 
-        // Оновлюємо документ користувача з новим масивом планів
         await _firestore.collection('users').doc(currentUser.uid).update({
           'planToDo': planToDoArray,
         });

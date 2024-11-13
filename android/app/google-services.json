@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "342745680331",
-    "project_id": "reporter-app-f0ec6",
-    "storage_bucket": "reporter-app-f0ec6.appspot.com"
+    "project_number": "308385091696",
+    "project_id": "reporter-a8a78",
+    "storage_bucket": "reporter-a8a78.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:342745680331:android:c9601aaf80621a1c4fce4e",
+        "mobilesdk_app_id": "1:308385091696:android:7e938994844f29469324b5",
         "android_client_info": {
           "package_name": "com.example.reporter"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAT8V02yMkfCQVP5mlxVz95K63kfEw8Gbw"
+          "current_key": "AIzaSyCQnA-isjKZwTVM-FRtaMZPZzWCATeOmYA"
         }
       ],
       "services": {

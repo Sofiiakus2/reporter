@@ -117,13 +117,15 @@ class _TaskBlockViewState extends State<TaskBlockView> with SingleTickerProvider
           GestureDetector(
             onTap: ()  async{
               String? comment = '';
-              if(!widget.isChecked){
-                comment = await showDialog<String>(
-                  context: context,
-                  builder: (context) {
-                    return CommentDialog();
-                  },
-                );
+              if (widget.isToday){
+                if (!widget.isChecked) {
+                  comment = await showDialog<String>(
+                    context: context,
+                    builder: (context) {
+                      return CommentDialog();
+                    },
+                  );
+                }
               }
 
               setState(()   {

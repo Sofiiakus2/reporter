@@ -5,6 +5,7 @@ class UserModel{
   final String? role;
   final String? name;
   final String? department;
+  final String? position;
   final String email;
   final String? password;
   final Map<String, bool>? plansToDo;
@@ -16,6 +17,7 @@ class UserModel{
     this.role,
    this.name,
     this.department,
+    this.position,
    required this.email,
    this.password,
     this.plansToDo,

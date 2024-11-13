@@ -36,9 +36,9 @@ class AuthService{
         'id': userCredential.user?.uid,
         'email': user.email,
         'name': user.name,
-        'countOfTasks': 0,
-        'countOfDoneTasks':0,
-        'role': user.role
+        'role': user.role,
+        'department': '',
+        'position':'',
       });
     }catch(e){
       rethrow;

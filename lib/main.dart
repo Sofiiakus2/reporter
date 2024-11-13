@@ -14,13 +14,13 @@ void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: const FirebaseOptions(
-        apiKey: 'AIzaSyAT8V02yMkfCQVP5mlxVz95K63kfEw8Gbw',
-        appId: '1:342745680331:android:c9601aaf80621a1c4fce4e',
-        messagingSenderId: '342745680331',
-        projectId: 'reporter-app-f0ec6'
+        apiKey: 'AIzaSyCQnA-isjKZwTVM-FRtaMZPZzWCATeOmYA',
+        appId: '1:308385091696:android:7e938994844f29469324b5',
+        messagingSenderId: '308385091696',
+        projectId: 'reporter-a8a78'
     )
   );
-  await FirebaseApi().initNotifications();
+  //await FirebaseApi().initNotifications();
 
   runApp(const MyApp());
 }

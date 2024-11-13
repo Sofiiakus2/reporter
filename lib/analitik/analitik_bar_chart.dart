@@ -1,7 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:reporter/services/user_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/dates.dart';
 import '../services/statistic_service.dart';
 import '../tasks/day_in_calendar.dart';
 import '../theme.dart';
@@ -22,15 +25,35 @@ class _AnalitikBarChartState extends State<AnalitikBarChart> {
   List<double>? progressData;
   int countOfDays = 0;
   bool isLoading = true;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  DateTime selectedDate = DateTime.now();
+
+  String day = '';
+  String month = '';
+
+
+  String? role = 'user';
+
+  Future<void> _loadData() async{
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    role = preferences.getString('role');
+  }
 
   Future<void> fetchDataWeek() async {
-    User? currentUser = _auth.currentUser;
     days = DayInCalendar.getWorkDays(DateTime.now());
     countOfDays = days.length;
     List<double> progress = [];
     for (int i = 0; i < 7; i++) {
-      progress.add((await StatisticService.countMyProgressForDay(days[i], widget.userId) * 100));
+      if(role == 'admin'){
+        List<String> allUserIds = await UserService.getAllUserIds();
+        progress.add((await StatisticService.countTeamProgressForDay(days[i], allUserIds) * 100));
+      }
+      else if(role == 'subadmin'){
+        progress.add((await StatisticService.countProgressForRole(days[i], widget.userId, role!) * 100));
+      }
+      else
+      {
+        progress.add((await StatisticService.countMyProgressForDay(days[i], widget.userId) * 100));
+      }
     }
 
     setState(() {
@@ -47,7 +70,18 @@ class _AnalitikBarChartState extends State<AnalitikBarChart> {
       DateTime day = DateTime(now.year, now.month, i);
       if (day.weekday >= DateTime.monday && day.weekday <= DateTime.friday) {
         days.add(day);
-        progress.add((await StatisticService.countMyProgressForDay(day, widget.userId) * 100));
+        if(role == 'admin'){
+          List<String> allUserIds = await UserService.getAllUserIds();
+          progress.add((await StatisticService.countTeamProgressForDay(day, allUserIds) * 100));
+        }
+        else if(role == 'subadmin'){
+          progress.add((await StatisticService.countProgressForRole(day, widget.userId, role!) * 100));
+        }
+        else{
+          progress.add((await StatisticService.countMyProgressForDay(
+                  day, widget.userId) *
+              100));
+        }
       }
     }
 
@@ -60,7 +94,7 @@ class _AnalitikBarChartState extends State<AnalitikBarChart> {
 
   void getSelectedDate() {
     if (touchedGroupIndex != -1 && touchedGroupIndex < days.length) {
-      DateTime selectedDate = days[touchedGroupIndex];
+      selectedDate = days[touchedGroupIndex];
       widget.onDateSelected(selectedDate);
     }
   }
@@ -68,6 +102,7 @@ class _AnalitikBarChartState extends State<AnalitikBarChart> {
   @override
   void initState() {
     super.initState();
+    _loadData();
     widget.isWeek
       ? fetchDataWeek()
       : fetchDataMonth();
@@ -76,20 +111,49 @@ class _AnalitikBarChartState extends State<AnalitikBarChart> {
   @override
   Widget build(BuildContext context) {
     return isLoading
-                ? Center(child: CircularProgressIndicator(color: primaryColor,))
+                ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(color: primaryColor,),
+                    SizedBox(height: 20,),
+                    Text('Зачейте, дані завантажуються', style: Theme.of(context).textTheme.labelSmall?.copyWith(color: primaryColor),)
+                  ],
+                )
                 : Container(
               margin: EdgeInsets.symmetric(horizontal: 40),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(touchedGroupIndex != -1 && progressData != null
-                      ? '${progressData![touchedGroupIndex].toStringAsFixed(0)}%'
-                      : '0%',
-                    style: Theme.of(context).textTheme.labelLarge,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(touchedGroupIndex != -1 && progressData != null
+                              ? '${progressData![touchedGroupIndex].toStringAsFixed(0)}%'
+                              : '0%',
+                            style: Theme.of(context).textTheme.labelLarge,
+                          ),
+                          Text('Результативність',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(day,
+                            style: Theme.of(context).textTheme.labelLarge,
+                          ),
+                          Text(month,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  Text('Результативність',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
+
                   Container(
                       height: 300,
                       margin: EdgeInsets.only(top: 30),
@@ -157,6 +221,9 @@ class _AnalitikBarChartState extends State<AnalitikBarChart> {
                                       }
                                       touchedGroupIndex = barTouchResponse.spot!.touchedBarGroupIndex;
                                       getSelectedDate();
+                                      day = selectedDate.day.toString();
+                                      month = DatesNames.monthsOfYear[selectedDate.month - 1];
+
                                     });
                                   }
                               )

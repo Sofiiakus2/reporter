@@ -43,8 +43,19 @@ class _ProfilePageState extends State<ProfilePage> {
                     AvatarBlock(),
                     Padding(
                       padding: EdgeInsets.only(bottom: 20),
-                      child: Text(user.name!,
-                      style: Theme.of(context).textTheme.titleLarge,),
+                      child: Text(
+                        user.name!.replaceAll(' ', '\n'),
+                        style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                          shadows: [
+                            Shadow(
+                              offset: Offset(4.0, 2.0),
+                              blurRadius: 5.0,
+                              color: Colors.grey.withOpacity(0.5),
+                            ),
+                          ],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ],
                 ),
