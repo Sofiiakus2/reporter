@@ -14,6 +14,7 @@ class UserService {
       if (snapshot.exists) {
         final data = snapshot.data();
         return UserModel(
+          id: user?.uid,
           role: data?['role'],
           name: data?['name'],
           department: data?['department'],

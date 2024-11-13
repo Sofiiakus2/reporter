@@ -21,10 +21,11 @@ class _MainProgresViewState extends State<MainProgresView> with SingleTickerProv
   late AnimationController _controller;
   late Animation<double> _progressAnimation;
   Timer? _timer;
+  User? currentUser;
 
   Future<void> _updateProgress() async {
     FirebaseAuth auth = FirebaseAuth.instance;
-    User? currentUser = auth.currentUser;
+    currentUser = auth.currentUser;
     double progress1 = await StatisticService.countMyProgressForDay(DateTime.now(), currentUser!.uid);
     setState(() {
       progress = progress1;
@@ -79,7 +80,7 @@ class _MainProgresViewState extends State<MainProgresView> with SingleTickerProv
     return Stack(
       alignment: Alignment.center,
       children: [
-        AvatarBlock(),
+        AvatarBlock(id: currentUser!.uid,),
         SizedBox(
           height: 300,
           width: 300,

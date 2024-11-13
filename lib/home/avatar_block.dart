@@ -6,7 +6,10 @@ import '../theme.dart';
 class AvatarBlock extends StatelessWidget {
   const AvatarBlock({
     super.key,
+    required this.id,
   });
+
+  final String id;
 
   @override
   Widget build(BuildContext context) {
@@ -30,12 +33,20 @@ class AvatarBlock extends StatelessWidget {
               child: SizedBox(
                 width: 240,
                 height: 240,
-                child: Image.network('https://e2.hespress.com/wp-content/uploads/2022/01/E_wooELVkAM6Sun-800x600.jpeg',
+                child: Image.asset(
+                  'assets/images/$id.jpg',
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      'assets/images/defaultImage.jpeg',
+                      fit: BoxFit.cover,
+                    );
+                  },
                 ),
               ),
             ),
           ),
+
         ),
         Container(
           width: 240,

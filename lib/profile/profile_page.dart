@@ -40,7 +40,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 Stack(
                   alignment: Alignment.bottomCenter,
                   children: [
-                    AvatarBlock(),
+                    AvatarBlock(id: user.id!,),
                     Padding(
                       padding: EdgeInsets.only(bottom: 20),
                       child: Text(
