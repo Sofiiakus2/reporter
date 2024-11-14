@@ -18,6 +18,12 @@ final lightTheme = ThemeData(
   dividerColor: dividerColor,
   textTheme: textTheme,
 
+  popupMenuTheme: PopupMenuThemeData(
+    color: dividerColor,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(16)),
+    ),
+  ),
   scaffoldBackgroundColor: backgroundColor,
   colorScheme: ColorScheme.fromSeed(
     seedColor: primaryColor,

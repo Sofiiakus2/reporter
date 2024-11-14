@@ -72,4 +72,24 @@ class AuthService{
     }
   }
 
+  static Future<void> changePassword(String newPassword) async {
+    try {
+      User? user = _auth.currentUser;
+
+      if (user != null) {
+        await user.updatePassword(newPassword);
+        await _auth.signOut();
+        await _auth.signInWithEmailAndPassword(email: user.email!, password: newPassword);
+      } else {
+        throw FirebaseAuthException(
+          code: 'user-not-found',
+          message: 'Користувач не знайдений або не увійшов у систему.',
+        );
+      }
+    } catch (e) {
+      print('Помилка при зміні паролю: $e');
+      throw e;
+    }
+  }
+
 }
