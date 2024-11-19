@@ -76,28 +76,18 @@ class StatisticService{
     int totalTasks = 0;
     int completedTasks = 0;
 
-   // print('--------------------------------');
-  //  print(userIds.length);
-    for (String userId in userIds) {
-      List<Map<String, dynamic>> planForDay = await UserService.getPlanToDo(targetDate, userId);
-     // print('--${userId}--------${planForDay}--------${targetDate}---');
+    List<Future<List<Map<String, dynamic>>>> tasksFutures = userIds.map((userId) {
+      return UserService.getPlanToDo(targetDate, userId);
+    }).toList();
+
+    List<List<Map<String, dynamic>>> allPlans = await Future.wait(tasksFutures);
+
+    for (var planForDay in allPlans) {
       totalTasks += planForDay.length;
-
-    //  print('=========================');
-     // print(totalTasks);
-      for (var task in planForDay) {
-        if (task['completed'] == true) {
-          completedTasks++;
-        //  print('C $completedTasks');
-        }
-      }
+      completedTasks += planForDay.where((task) => task['completed'] == true).length;
     }
 
-    if (totalTasks == 0) {
-      return 0.0;
-    } else {
-      return completedTasks / totalTasks;
-    }
+    return totalTasks == 0 ? 0.0 : completedTasks / totalTasks;
   }
 
 
